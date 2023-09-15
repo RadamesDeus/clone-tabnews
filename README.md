@@ -1,2 +1,2 @@
 # clone-tabnews
-Estudo do tabnews do Felipe Dilipe Deschamps curso.dev
+Estudo do tabnews do Felipe Deschamps curso.dev
