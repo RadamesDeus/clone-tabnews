@@ -9,10 +9,18 @@ async function query( queryObject ) {
     password: process.env.POSTGRES_PASSWORD,
   } );
   await client.connect();
-  const query = await client.query( queryObject )
-  await client.end();
-  console.log( 'RADA: ', query );
+  let query;
+  try {
+    query = await client.query( queryObject )
+    await client.end();
+  } catch ( error ) {
+
+  } finally {
+    await client.end();
+  }
   return query;
+
+
 }
 
 export default {
