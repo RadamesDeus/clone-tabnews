@@ -3,9 +3,11 @@ import { join } from "path"
 import database from "infra/database"
 
 export default async function migrations( request, response ) {
+  console.log( request.method );
+
 
   if ( request.method != "GET" && request.method != "POST" ) {
-    return response.status( 405 )
+    return response.status( 405 ).json( { error: "Method Not Allowed" } )
   }
   const dbClient = await database.getNewClient();
 
