@@ -1,7 +1,7 @@
 const { exec } = require( "node:child_process" );
 
 function checkPostgres() {
-  exec( "docker exec postgres-dev pg_isready --host localhost", handleCallback );
+  exec( "docker exec postgres-dev pg_isready -h localhost", handleCallback );
 
   function handleCallback( err, out ) {
     if ( out.search( "accepting connections" ) === -1 ) {

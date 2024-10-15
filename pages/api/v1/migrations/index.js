@@ -12,6 +12,7 @@ export default async function migrations( request, response ) {
   const dbClient = await database.getNewClient();
 
   try {
+    console.log( "INICIO start", new Date().toString() );
 
     const configOptions = {
       dbClient,
@@ -39,6 +40,7 @@ export default async function migrations( request, response ) {
     console.error( error );
     throw error;
   } finally {
+    console.log( "FIM END", new Date().toString() );
     dbClient.end();
   }
 
