@@ -20,7 +20,11 @@ async function login( request, response ) {
   } )
     .then( response => response.text() ) // Obtém a resposta como texto
     .then( conteudo => {
-      console.log( conteudo ); // Exibe o conteúdo da resposta
+      const regex =
+        /(?:UrlProfile = '\/Dimep\/Pessoas\/UserProfilePessoas\/)\d+/;
+      const foundBody = response.data.match( regex );
+      console.log( "Radames" );
+      console.log( foundBody ); // Exibe o conteúdo da resposta
       // Verifique o conteúdo para determinar se o login foi bem-sucedido
     } )
     .catch( error => {
