@@ -26,7 +26,7 @@ async function login( request, response ) {
       //   /(?:UrlProfile = '\/Dimep\/Pessoas\/UserProfilePessoas\/)\d+/;
       // const foundBody = conteudo.data.match( regex );
       // console.log( "Radames" );
-      console.log( str.search( 'Radam' ) ); // Exibe o conteúdo da resposta
+      console.log( conteudo.search( 'Radam' ) ); // Exibe o conteúdo da resposta
       // Verifique o conteúdo para determinar se o login foi bem-sucedido
     } )
     .catch( error => {
