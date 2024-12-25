@@ -1,6 +1,6 @@
 const { exec } = require( "node:child_process" );
 
-function checkPostgres() {
+async function checkPostgres() {
   exec( "docker exec postgres-dev pg_isready -h localhost", handleCallback );
 
   function handleCallback( err, out ) {
@@ -9,9 +9,9 @@ function checkPostgres() {
       checkPostgres();
       return;
     }
-    console.log( "end\n\\0/ O postgres já aceita conexões\n" );
+    console.log( "end\n\🟢 O Postgres já aceita conexões\n" );
   }
 }
 
-process.stdout.write( "\n\n:) Aguardando o postgres aceitar conexões..." );
+process.stdout.write( "\n\n🔴 Aguardando o postgres aceitar conexões..." );
 checkPostgres();
