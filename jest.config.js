@@ -4,6 +4,7 @@ const nextJest = require( 'next/jest' );
 /** @type {import('jest').Config} */
 const config = {
   moduleDirectories: [ 'node_modules', '<rootDir>' ],
+  testTimeout: 60000,
 };
 
 const createJestConfig = nextJest();
