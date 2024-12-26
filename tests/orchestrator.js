@@ -1,26 +1,26 @@
-process.stdout.write( '🔴 Aguardando servidor' )
+process.stdout.write("🔴 Aguardando servidor");
 async function awaitForAllServices() {
   try {
-    const webServiceStatusCode = await awaitForWebService()
+    const webServiceStatusCode = await awaitForWebService();
 
-    if ( webServiceStatusCode === 200 ) {
-      process.stdout.write( '\n🟢 Servidor inicializado!\n\n' )
+    if (webServiceStatusCode === 200) {
+      process.stdout.write("\n🟢 Servidor inicializado!\n\n");
 
-      return
+      return;
     }
-  } catch ( error ) {
-    process.stdout.write( '.' )
+  } catch (error) {
+    process.stdout.write(".");
 
-    setTimeout( awaitForAllServices, 100 )
+    setTimeout(awaitForAllServices, 100);
   }
 
   async function awaitForWebService() {
-    const response = await fetch( 'http://localhost:3000/api/v1/status' )
+    const response = await fetch("http://localhost:3000/api/v1/status");
 
-    await response.json()
+    await response.json();
 
-    return response.status
+    return response.status;
   }
 }
 
-awaitForAllServices()
+awaitForAllServices();
