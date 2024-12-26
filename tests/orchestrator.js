@@ -8,7 +8,8 @@ async function awaitForAllServices() {
 
       return;
     }
-  } catch (error) {
+  } catch {
+    //catch(error)
     process.stdout.write(".");
 
     setTimeout(awaitForAllServices, 100);
