@@ -20,7 +20,8 @@
     "lint:eslint:check": "next lint --dir .",
     "orchestrator": "node tests/orchestrator.js",
     "prepare": "husky",
-    "commit": "cz"
+    "commit": "cz",
+    "git:commit" : "git add -A && yarn commit && git push"
   },
   "keywords": [],
   "author": "",
