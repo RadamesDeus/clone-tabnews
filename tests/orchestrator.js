@@ -1,27 +1,11 @@
-process.stdout.write("🔴 Aguardando servidor");
-async function awaitForAllServices() {
-  try {
-    const webServiceStatusCode = await awaitForWebService();
+import database from "infra/database.js";
 
-    if (webServiceStatusCode === 200) {
-      process.stdout.write("\n🟢 Servidor inicializado!\n\n");
-
-      return;
-    }
-  } catch {
-    //catch(error)
-    process.stdout.write(".");
-
-    setTimeout(awaitForAllServices, 100);
-  }
-
-  async function awaitForWebService() {
-    const response = await fetch("http://localhost:3000/api/v1/status");
-
-    await response.json();
-
-    return response.status;
-  }
+async function cleanDatabase() {
+  await database.query("drop schema public cascade; create schema public");
 }
 
-awaitForAllServices();
+const orchestrator = {
+  cleanDatabase
+}
+
+export default orchestrator;
