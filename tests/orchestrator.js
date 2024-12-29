@@ -5,7 +5,7 @@ async function cleanDatabase() {
 }
 
 const orchestrator = {
-  cleanDatabase
-}
+  cleanDatabase,
+};
 
 export default orchestrator;
