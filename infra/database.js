@@ -1,15 +1,17 @@
 import { Client } from "pg";
 
 async function query(queryObject) {
-  const client = await getNewClient();
+  let client;
   try {
+    client = await getNewClient();
     const result = await client.query(queryObject);
     return result;
   } catch (error) {
+    console.log("\n Erro dentro co cath do database:");
     console.error(error);
     throw error;
   } finally {
-    await client.end();
+    await client?.end();
   }
 }
 
