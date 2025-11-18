@@ -1,5 +1,19 @@
+import { createRouter } from "next-connect";
+
 import database from "infra/database.js";
 import { InternalServerError } from "infra/errors";
+
+const router = createRouter();
+
+router.get(status);
+
+
+export default router.handler({
+  onNoMatch(req, res) {
+    res.status(405).end()// .json({ error: "Method Not Allowed" });
+  },
+});
+
 
 async function status(request, response) {
   try {
@@ -32,4 +46,3 @@ async function status(request, response) {
   }
 }
 
-export default status;
