@@ -1,4 +1,5 @@
 import { Client } from "pg";
+import { ServiceError } from "infra/errors.js";
 
 async function query(queryObject) {
   let client;
@@ -7,9 +8,10 @@ async function query(queryObject) {
     const result = await client.query(queryObject);
     return result;
   } catch (error) {
-    console.log("\n Erro dentro co cath do database:");
-    console.error(error);
-    throw error;
+    throw new ServiceError({
+      cause: error,
+      message: "Erro ao consultar o banco de dados.",
+    });
   } finally {
     await client?.end();
   }
