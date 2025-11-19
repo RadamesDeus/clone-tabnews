@@ -9,11 +9,10 @@ router.get(status);
 
 export default router.handler({
   onNoMatch,
-  onError
+  onError,
 });
 
 async function status(request, response) {
-
   const updateAt = new Date().toISOString();
   const versionpg = await database.query(`SHOW server_version;`);
   const max_connections = await database.query(`SHOW max_connections;`);
@@ -34,6 +33,4 @@ async function status(request, response) {
       },
     },
   });
-
 }
-

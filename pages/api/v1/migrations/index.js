@@ -12,7 +12,7 @@ router.post(postHandlerMigrations);
 
 export default router.handler({
   onNoMatch,
-  onError
+  onError,
 });
 
 const configOptions = {
@@ -22,7 +22,6 @@ const configOptions = {
   verbose: true,
   migrationsTable: "pgmigrations",
 };
-
 
 async function postHandlerMigrations(request, response) {
   let dbClient;
@@ -40,11 +39,9 @@ async function postHandlerMigrations(request, response) {
   } finally {
     dbClient.end();
   }
-
 }
 
 async function getHandlerMigrations(request, response) {
-
   let dbClient;
   try {
     dbClient = await database.getNewClient();
