@@ -21,7 +21,7 @@ async function execHandlerMigrations() {
       dbClient,
       dryRun: false,
     });
-    return migratedMigrations
+    return migratedMigrations;
   } catch (error) {
     throw new ServiceError({
       cause: error,

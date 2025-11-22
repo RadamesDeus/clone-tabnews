@@ -12,14 +12,11 @@ export default router.handler({
   onError,
 });
 
-
 async function postHandlerMigrations(request, response) {
-
   const migratedMigrations = await migrator.execHandlerMigrations();
   return response
     .status(migratedMigrations.length > 0 ? 201 : 200)
     .json(migratedMigrations);
-
 }
 
 async function getHandlerMigrations(request, response) {
