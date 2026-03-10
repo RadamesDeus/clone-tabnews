@@ -2,7 +2,6 @@ import database from "infra/database.js";
 import { ValidationError } from "infra/errors.js";
 
 async function create(userInputVlaues) {
-
   await getEmailDuplicate(userInputVlaues.email);
   await getUsernameDuplicate(userInputVlaues.username);
 
@@ -47,13 +46,15 @@ async function create(userInputVlaues) {
             VALUES ($1,$2,$3)
               returning *
               ;`,
-      values: [userInputVlaues.username, userInputVlaues.email, userInputVlaues.password],
+      values: [
+        userInputVlaues.username,
+        userInputVlaues.email,
+        userInputVlaues.password,
+      ],
     });
 
     return result.rows[0];
   }
-
-
 }
 
 const user = {

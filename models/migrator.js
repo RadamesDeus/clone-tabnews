@@ -3,7 +3,6 @@ import { resolve } from "node:path";
 import database from "infra/database";
 import { ServiceError } from "infra/errors.js";
 
-
 const configOptions = {
   dryRun: true,
   dir: resolve("infra", "migrations"),

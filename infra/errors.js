@@ -16,7 +16,6 @@ export class InternalServerError extends Error {
   }
 }
 
-
 export class ValidationError extends Error {
   constructor({ action, cause, status_code }) {
     super("Ocorreu um erro de validação.", { cause });

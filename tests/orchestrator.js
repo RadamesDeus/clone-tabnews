@@ -9,7 +9,7 @@ async function execPendingMigrations() {
 }
 const orchestrator = {
   cleanDatabase,
-  execPendingMigrations
+  execPendingMigrations,
 };
 
 export default orchestrator;
