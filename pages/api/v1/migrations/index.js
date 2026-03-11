@@ -1,6 +1,6 @@
 import { createRouter } from "next-connect";
 import { onNoMatch, onError } from "infra/controller";
-import migrator from "model/migrator.js";
+import migrator from "models/migrator.js";
 
 const router = createRouter();
 

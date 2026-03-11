@@ -10,7 +10,7 @@ async function query(queryObject) {
   } catch (error) {
     throw new ServiceError({
       cause: error,
-      message: "Erro ao consultar o banco de dados.",
+      message: "Erro na conexão ou na query! ",
     });
   } finally {
     await client?.end();

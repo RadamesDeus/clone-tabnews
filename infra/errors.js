@@ -16,6 +16,43 @@ export class InternalServerError extends Error {
   }
 }
 
+export class ValidationError extends Error {
+  constructor({ action, cause, status_code }) {
+    super("Ocorreu um erro de validação.", { cause });
+    this.name = "ValidationError";
+    this.action = action || "entre em contato com suport.";
+    this.status_code = status_code || 400;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.status_code,
+    };
+  }
+}
+
+export class NotFoundError extends Error {
+  constructor({ action, cause, status_code, message }) {
+    super("Ocorreu um erro de não encontrado.", { cause });
+    this.name = "NotFoundError";
+    this.action = action || "entre em contato com suport.";
+    this.message = message || "O recurso solicitado não foi encontrado.";
+    this.status_code = status_code || 404;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.status_code,
+    };
+  }
+}
+
 export class MethodNotAllowedError extends Error {
   constructor() {
     super("Metodo não permitido para este endpoint.");
