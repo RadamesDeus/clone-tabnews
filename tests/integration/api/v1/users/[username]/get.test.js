@@ -9,7 +9,6 @@ beforeAll(async () => {
 describe("GET  /api/v1/users/[username]", () => {
   describe("Anonynous user", () => {
     test("With exact case match `username`", async () => {
-
       const response = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
         headers: {
@@ -23,12 +22,15 @@ describe("GET  /api/v1/users/[username]", () => {
       });
       expect(response.status).toBe(201);
 
-      const response1 = await fetch("http://localhost:3000/api/v1/users/MesmoCase", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response1 = await fetch(
+        "http://localhost:3000/api/v1/users/MesmoCase",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
       expect(response1.status).toBe(200);
 
       const responseBody = await response1.json();
@@ -43,7 +45,6 @@ describe("GET  /api/v1/users/[username]", () => {
     });
 
     test("With case mismatch `username`", async () => {
-
       const response = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
         headers: {
@@ -57,12 +58,15 @@ describe("GET  /api/v1/users/[username]", () => {
       });
       expect(response.status).toBe(201);
 
-      const response1 = await fetch("http://localhost:3000/api/v1/users/casemismatch", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response1 = await fetch(
+        "http://localhost:3000/api/v1/users/casemismatch",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
       expect(response1.status).toBe(200);
 
       const responseBody = await response1.json();
@@ -77,13 +81,15 @@ describe("GET  /api/v1/users/[username]", () => {
     });
 
     test("With user not existing `username`", async () => {
-
-      const response = await fetch("http://localhost:3000/api/v1/users/noUserNameExist", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "http://localhost:3000/api/v1/users/noUserNameExist",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
       expect(response.status).toBe(404);
     });
   });

@@ -12,7 +12,6 @@ export default router.handler({
 });
 
 async function postHandlerUsers(request, response) {
-
   const userData = request.body; //JSON.parse(request.body);
 
   const newUser = await user.create(userData);
