@@ -68,7 +68,10 @@ async function create(userInputVlaues) {
 
 async function findByUsername(username) {
   const result = await database.query({
-    text: `SELECT * FROM users WHERE LOWER(username) = LOWER($1) LIMIT 1;`,
+    text: `SELECT 
+          * 
+          FROM users 
+          WHERE LOWER(username) = LOWER($1) LIMIT 1;`,
     values: [username],
   });
 
