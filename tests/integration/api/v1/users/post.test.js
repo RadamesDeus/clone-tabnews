@@ -1,6 +1,7 @@
 import { version as uuidVersion } from "uuid";
 import orchestrator from "tests/orchestrator.js";
-// import database from "infra/database.js";
+import user from "models/user";
+import password from "models/password";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -29,7 +30,7 @@ describe("POST  /api/v1/users", () => {
         id: responseBody.id,
         username: "testuser",
         email: "rainbow@gmail.com",
-        password: "123475",
+        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -37,6 +38,18 @@ describe("POST  /api/v1/users", () => {
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
+
+      const createdUser = await user.findByUsername(responseBody.username);
+      const isPasswordHashed = await password.verify(
+        "123475",
+        createdUser.password,
+      );
+      const isnotPasswordHashed = await password.verify(
+        "senhaErrada",
+        createdUser.password,
+      );
+      expect(isPasswordHashed).toBe(true);
+      expect(isnotPasswordHashed).toBe(false);
     });
     test("With duplicate `email`", async () => {
       const response1 = await fetch("http://localhost:3000/api/v1/users", {

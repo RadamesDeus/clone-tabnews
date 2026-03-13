@@ -1,9 +1,11 @@
 import database from "infra/database.js";
+import password from "models/password.js";
 import { ValidationError, NotFoundError } from "infra/errors.js";
 
 async function create(userInputVlaues) {
   await getEmailDuplicate(userInputVlaues.email);
   await getUsernameDuplicate(userInputVlaues.username);
+  await hashPasswordInObject(userInputVlaues);
 
   const newUser = await runInsertQuery(userInputVlaues);
   return newUser;
@@ -40,6 +42,13 @@ async function create(userInputVlaues) {
     }
   }
 
+  async function hashPasswordInObject(userInputVlaues) {
+    const result = await password.hash(userInputVlaues.password);
+    userInputVlaues.password = result;
+
+    return userInputVlaues;
+  }
+
   async function runInsertQuery(userInputVlaues) {
     const result = await database.query({
       text: `INSERT INTO users (username, email, password)
@@ -59,7 +68,10 @@ async function create(userInputVlaues) {
 
 async function findByUsername(username) {
   const result = await database.query({
-    text: `SELECT * FROM users WHERE LOWER(username) = LOWER($1) LIMIT 1;`,
+    text: `SELECT 
+          * 
+          FROM users 
+          WHERE LOWER(username) = LOWER($1) LIMIT 1;`,
     values: [username],
   });
 

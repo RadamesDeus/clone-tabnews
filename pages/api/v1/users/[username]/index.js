@@ -12,7 +12,6 @@ export default router.handler({
 });
 
 async function getHandlerUsers(request, response) {
-  console.log("RADAMES request.body:", request.query?.username);
   const username = request.query?.username;
 
   const userItem = await user.findByUsername(username);
