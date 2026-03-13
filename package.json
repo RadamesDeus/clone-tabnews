@@ -20,7 +20,7 @@
     "lint:eslint:check": "next lint --dir .",
     "prepare": "husky",
     "commit": "cz",
-    "git:commit": "yarn lint:prettier:fix && git add -A && yarn commit && git push"
+    "git:commit": "git add -A && yarn commit && git push"
   },
   "keywords": [],
   "author": "",
