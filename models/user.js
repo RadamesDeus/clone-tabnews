@@ -95,7 +95,7 @@ async function update(username, userInputValue) {
   ) {
     await getUsernameDuplicate(userInputValue.username);
   }
-  if (userInputValue.email) {
+  if (userInputValue.email && userInputValue.email.toLowerCase() !== currentUser.email.toLowerCase()) {
     await getEmailDuplicate(userInputValue.email);
   }
 
