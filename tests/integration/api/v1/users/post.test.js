@@ -51,6 +51,7 @@ describe("POST  /api/v1/users", () => {
       expect(isPasswordHashed).toBe(true);
       expect(isnotPasswordHashed).toBe(false);
     });
+
     test("With duplicate `email`", async () => {
       const response1 = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
@@ -81,8 +82,8 @@ describe("POST  /api/v1/users", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "Ocorreu um erro de validação.",
-        action: "Utilize outro email para criar sua conta.",
+        message: "Erro ao execultar essa operação.",
+        action: "Utilize outro email para essa operação.",
         status_code: 400,
       });
     });
@@ -118,7 +119,7 @@ describe("POST  /api/v1/users", () => {
       expect(responseBody).toEqual({
         name: "ValidationError",
         message: "Ocorreu um erro de validação.",
-        action: "Utilize outro username para criar sua conta.",
+        action: "Utilize outro username para essa operação.",
         status_code: 400,
       });
     });
