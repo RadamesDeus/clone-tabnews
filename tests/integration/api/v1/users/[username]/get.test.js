@@ -9,12 +9,11 @@ beforeAll(async () => {
 describe("GET  /api/v1/users/[username]", () => {
   describe("Anonynous user", () => {
     test("With exact case match `username`", async () => {
-
       await orchestrator.createUser({
         username: "MesmoCase",
         email: "MesmoCase@gmail.com",
         password: "123475",
-      })
+      });
 
       const response1 = await fetch(
         "http://localhost:3000/api/v1/users/MesmoCase",
@@ -39,12 +38,11 @@ describe("GET  /api/v1/users/[username]", () => {
     });
 
     test("With case mismatch `username`", async () => {
-
       await orchestrator.createUser({
         username: "caseMismatch",
         email: "caseMismatch@gmail.com",
         password: "123475",
-      })
+      });
 
       const response1 = await fetch(
         "http://localhost:3000/api/v1/users/casemismatch",

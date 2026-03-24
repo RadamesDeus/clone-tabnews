@@ -32,11 +32,11 @@ describe("PATCH  /api/v1/users/[username]", () => {
     test("With noupdate username duplicate", async () => {
       await orchestrator.createUser({
         username: "user1",
-      })
+      });
 
       await orchestrator.createUser({
         username: "user2",
-      })
+      });
 
       const responseUp_username = await fetch(
         "http://localhost:3000/api/v1/users/user2",
@@ -63,14 +63,13 @@ describe("PATCH  /api/v1/users/[username]", () => {
     });
 
     test("With noupdate email duplicate", async () => {
-
       await orchestrator.createUser({
         email: "useremail1@gmail.com",
-      })
+      });
 
       const user2 = await orchestrator.createUser({
         email: "useremail2@gmail.com",
-      })
+      });
 
       const responseUp_email = await fetch(
         `http://localhost:3000/api/v1/users/${user2.username}`,
@@ -97,10 +96,9 @@ describe("PATCH  /api/v1/users/[username]", () => {
     });
 
     test("With update username valid", async () => {
-
       const userValid = await orchestrator.createUser({
         username: "usernameValid",
-      })
+      });
 
       const responseUp_username = await fetch(
         `http://localhost:3000/api/v1/users/${userValid.username}`,
@@ -132,10 +130,9 @@ describe("PATCH  /api/v1/users/[username]", () => {
     });
 
     test("With update email valid", async () => {
-
       const emailValid = await orchestrator.createUser({
         email: "emailvalid@gmail.com",
-      })
+      });
 
       const responseUp_email = await fetch(
         `http://localhost:3000/api/v1/users/${emailValid.username}`,
@@ -167,7 +164,7 @@ describe("PATCH  /api/v1/users/[username]", () => {
     test("With update password valid", async () => {
       const userPasswordValid = await orchestrator.createUser({
         password: "passwordvalid",
-      })
+      });
 
       const responseUp_email = await fetch(
         `http://localhost:3000/api/v1/users/${userPasswordValid.username}`,
@@ -196,7 +193,6 @@ describe("PATCH  /api/v1/users/[username]", () => {
 
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(responseBody.updated_at).not.toBe(responseBody.created_at);
-
 
       const createdUser = await user.findByUsername(responseBody.username);
       const isPasswordHashed = await password.verify(
