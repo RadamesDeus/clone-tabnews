@@ -12,7 +12,7 @@ async function execPendingMigrations() {
 
 async function createUser(newUser) {
   return await user.create({
-    username: newUser.username || faker.internet.userName(),
+    username: newUser.username || faker.internet.username(),
     email: newUser.email || faker.internet.email(),
     password: newUser.password || "Senha123",
   });
