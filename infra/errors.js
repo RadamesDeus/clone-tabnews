@@ -35,6 +35,24 @@ export class ValidationError extends Error {
   }
 }
 
+export class UnauthorizedError extends Error {
+  constructor({ action, cause, status_code, message }) {
+    super("Usuário não autorizado.", { cause });
+    this.name = "UnauthorizedError";
+    this.action = action || "verifique se os dados estão corretos.";
+    this.message = message || `Os dados informados não conferem.`;
+    this.status_code = status_code || 401;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.status_code,
+    };
+  }
+}
 export class NotFoundError extends Error {
   constructor({ action, cause, status_code, message }) {
     super("Ocorreu um erro de não encontrado.", { cause });

@@ -85,6 +85,34 @@ async function findByUsername(username) {
   }
   return result.rows[0];
 }
+async function findByEmail(email) {
+  const result = await database.query({
+    text: `SELECT 
+          * 
+          FROM users 
+          WHERE LOWER(email) = LOWER($1) LIMIT 1;`,
+    values: [email],
+  });
+
+  if (result.rowCount == 0) {
+    throw new NotFoundError({
+      cause: "Email não encontrado.",
+      action: "verifique o email e tente novamente.",
+      message: `O email informado [${email}] não existe.`,
+    });
+  }
+  return result.rows[0];
+}
+
+// async function login(email, passwordInput) {
+//   const user = await findByEmail(email);
+//   const isMatch = await password.verify(passwordInput, user.password);
+//   if (!isMatch) {
+//     throw new UnauthorizedError({});
+//   }
+
+//   return user;
+// }
 
 async function update(username, userInputValue) {
   const currentUser = await findByUsername(username);
@@ -134,6 +162,7 @@ const user = {
   create,
   findByUsername,
   update,
+  findByEmail,
 };
 
 export default user;
