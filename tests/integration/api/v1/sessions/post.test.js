@@ -3,7 +3,7 @@ import setCookiePparser from "set-cookie-parser";
 
 import orchestrator from "tests/orchestrator.js";
 import session from "models/session";
-import { tr } from "@faker-js/faker";
+// import { tr } from "@faker-js/faker";
 // import user from "models/user";
 // import password from "models/password";
 
