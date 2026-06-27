@@ -26,7 +26,20 @@ async function updateById(id) {
 
   return result.rows[0];
 }
+async function expireById(id) {
+  const result = await database.query({
+    text: `Update 
+              sessions 
+            SET 
+              expires_at = expires_at - interval '1 year',
+              updated_at = NOW() 
+            WHERE id = $1 
+            RETURNING *;`,
+    values: [id],
+  });
 
+  return result.rows[0];
+}
 async function findOneValidByToken(token) {
   const result = await database.query({
     text: `SELECT * FROM sessions WHERE token = $1 AND expires_at > NOW() LIMIT 1;`,
@@ -47,6 +60,7 @@ const session = {
   create,
   findOneValidByToken,
   updateById,
+  expireById,
   EXPIRESATINDAYS_IN_MILLSECOND,
 };
 

@@ -1,6 +1,11 @@
 import { createRouter } from "next-connect";
 
-import { onNoMatch, onError, setSessionCookie } from "infra/controller";
+import {
+  onNoMatch,
+  onError,
+  setSessionCookie,
+  cleanSessionCookie,
+} from "infra/controller";
 
 import autentication from "models/autentication.js";
 import session from "models/session.js";
@@ -8,6 +13,7 @@ import session from "models/session.js";
 const router = createRouter();
 
 router.post(postHandlerSessions);
+router.delete(deleteHandlerSessions);
 
 export default router.handler({
   onNoMatch,
@@ -26,4 +32,13 @@ async function postHandlerSessions(request, response) {
   setSessionCookie(response, newSession.token);
 
   response.status(201).json(newSession);
+}
+
+async function deleteHandlerSessions(request, response) {
+  const sessionValid = await session.findOneValidByToken(
+    request.cookies.session_id,
+  );
+  const sessionValidUpdated = await session.expireById(sessionValid.id);
+  cleanSessionCookie(response);
+  return response.status(200).json(sessionValidUpdated);
 }

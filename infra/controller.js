@@ -40,3 +40,14 @@ export function setSessionCookie(response, sessionToken) {
 
   response.setHeader("Set-Cookie", setCookes);
 }
+
+export function cleanSessionCookie(response) {
+  const setCookes = cookie.serialize("session_id", "invalid", {
+    httpOnly: true,
+    path: "/",
+    maxAge: -1,
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  response.setHeader("Set-Cookie", setCookes);
+}
