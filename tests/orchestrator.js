@@ -1,6 +1,7 @@
 import database from "infra/database.js";
 import migrator from "models/migrator.js";
 import user from "models/user.js";
+import session from "models/session.js";
 import { faker } from "@faker-js/faker";
 
 async function cleanDatabase() {
@@ -18,10 +19,16 @@ async function createUser(newUser) {
   });
 }
 
+async function createSession(userId) {
+  const newSession = await session.create(userId);
+  return newSession;
+}
+
 const orchestrator = {
   cleanDatabase,
   execPendingMigrations,
   createUser,
+  createSession,
 };
 
 export default orchestrator;

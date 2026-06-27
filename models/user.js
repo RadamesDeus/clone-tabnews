@@ -158,11 +158,29 @@ async function update(username, userInputValue) {
   return result.rows[0];
 }
 
+async function findOneById(id) {
+  const result = await database.query({
+    text: `SELECT * FROM users WHERE id = $1 LIMIT 1;`,
+    values: [id],
+  });
+
+  if (result.rowCount == 0) {
+    throw new NotFoundError({
+      cause: "Usuário não encontrado.",
+      action: "verifique o id e tente novamente.",
+      message: `O usuário informado [${id}] não existe.`,
+      status_code: 401,
+    });
+  }
+  return result.rows[0];
+}
+
 const user = {
   create,
   findByUsername,
   update,
   findByEmail,
+  findOneById,
 };
 
 export default user;

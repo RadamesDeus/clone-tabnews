@@ -1,10 +1,13 @@
+import * as cookie from "cookie";
+
 import {
   InternalServerError,
   MethodNotAllowedError,
   ValidationError,
   NotFoundError,
   UnauthorizedError,
-} from "infra/errors";
+} from "infra/errors.js";
+import session from "models/session.js";
 
 export function onNoMatch(req, res) {
   const publicErroObject = new MethodNotAllowedError();
@@ -25,4 +28,15 @@ export function onError(err, req, res) {
   });
   console.error(publicErroObject);
   res.status(publicErroObject.status_code).json(publicErroObject);
+}
+
+export function setSessionCookie(response, sessionToken) {
+  const setCookes = cookie.serialize("session_id", sessionToken, {
+    httpOnly: true,
+    path: "/",
+    maxAge: session.EXPIRESATINDAYS_IN_MILLSECOND / 1000,
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  response.setHeader("Set-Cookie", setCookes);
 }
