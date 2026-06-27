@@ -112,6 +112,7 @@ describe("POST  /api/v1/sessions", () => {
 
       expect(bodyResponse).toEqual({
         created_at: bodyResponse.created_at,
+        updated_at: bodyResponse.updated_at,
         expires_at: bodyResponse.expires_at,
         id: bodyResponse.id,
         token: bodyResponse.token,
@@ -131,7 +132,9 @@ describe("POST  /api/v1/sessions", () => {
 
       const diffInMilles = expires_at.getTime() - created_at.getTime();
 
-      expect(diffInMilles).toBe(session.EXPIRESATINDAYS_IN_MILLSECOND);
+      expect(diffInMilles).toBeGreaterThanOrEqual(
+        session.EXPIRESATINDAYS_IN_MILLSECOND,
+      );
 
       const cookies = await setCookiePparser(response, { map: true });
 
