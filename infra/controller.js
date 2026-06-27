@@ -11,7 +11,7 @@ import session from "models/session.js";
 
 export function onNoMatch(req, res) {
   const publicErroObject = new MethodNotAllowedError();
-  // console.error(publicErroObject);
+  console.error(publicErroObject);
   res.status(publicErroObject.status_code).json(publicErroObject);
 }
 export function onError(err, req, res) {
