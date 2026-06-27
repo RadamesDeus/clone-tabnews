@@ -25,5 +25,10 @@ async function getHandlerUser(request, response) {
 
   setSessionCookie(response, sessionUpdated.token);
 
+  response.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, proxy-revalidate",
+  );
+
   return response.status(200).json(userFound);
 }

@@ -40,6 +40,11 @@ describe("GET  /api/v1/user", () => {
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
 
+      const cacheControlHeader = response.headers.get("Cache-Control");
+      expect(cacheControlHeader).toBe(
+        "no-store, no-cache, must-revalidate, proxy-revalidate",
+      );
+
       const sessionValidUpdated = await session.findOneValidByToken(
         sessionObj.token,
       );
