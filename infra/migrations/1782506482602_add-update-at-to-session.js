@@ -10,6 +10,4 @@ exports.up = (pgm) => {
   });
 };
 
-exports.down = (pgm) => {
-  pgm.dropColumn("sessions", "updated_at");
-};
+exports.down = false;
