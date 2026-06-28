@@ -6,20 +6,22 @@ async function create(userInputValues) {
   await getEmailDuplicate(userInputValues.email);
   await getUsernameDuplicate(userInputValues.username);
   await hashPasswordInObject(userInputValues);
+  await inputDeafaultFeaturesInObhect(userInputValues);
 
   const newUser = await runInsertQuery(userInputValues);
   return newUser;
 
   async function runInsertQuery(userInputValues) {
     const result = await database.query({
-      text: `INSERT INTO users (username, email, password)
-            VALUES ($1,$2,$3)
+      text: `INSERT INTO users (username, email, password, features)
+            VALUES ($1,$2,$3,$4)
               returning *
               ;`,
       values: [
         userInputValues.username.trim(),
         userInputValues.email.trim(),
         userInputValues.password.trim(),
+        userInputValues.features,
       ],
     });
 
@@ -104,15 +106,9 @@ async function findByEmail(email) {
   return result.rows[0];
 }
 
-// async function login(email, passwordInput) {
-//   const user = await findByEmail(email);
-//   const isMatch = await password.verify(passwordInput, user.password);
-//   if (!isMatch) {
-//     throw new UnauthorizedError({});
-//   }
-
-//   return user;
-// }
+async function inputDeafaultFeaturesInObhect(userInputValues) {
+  userInputValues.features = ["read:activation_token"];
+}
 
 async function update(username, userInputValue) {
   const currentUser = await findByUsername(username);
