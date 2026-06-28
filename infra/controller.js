@@ -15,11 +15,12 @@ export function onNoMatch(req, res) {
   res.status(publicErroObject.status_code).json(publicErroObject);
 }
 export function onError(err, req, res) {
-  if (
-    err instanceof ValidationError ||
-    err instanceof NotFoundError ||
-    err instanceof UnauthorizedError
-  ) {
+  if (err instanceof ValidationError || err instanceof NotFoundError) {
+    return res.status(err.status_code).json(err);
+  }
+
+  if (err instanceof UnauthorizedError) {
+    cleanSessionCookie(res);
     return res.status(err.status_code).json(err);
   }
 

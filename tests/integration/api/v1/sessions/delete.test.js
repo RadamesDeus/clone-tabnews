@@ -54,6 +54,16 @@ describe("DELETE  /api/v1/sessions", () => {
       });
 
       expect(response2.status).toBe(401);
+
+      const cookies2 = await setCookiePparser(response2, { map: true });
+
+      expect(cookies2.session_id).toEqual({
+        name: "session_id",
+        value: "invalid",
+        httpOnly: true,
+        path: "/",
+        maxAge: -1,
+      });
     });
 
     test("Delete With invalid session", async () => {
