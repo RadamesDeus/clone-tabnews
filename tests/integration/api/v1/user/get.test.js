@@ -91,7 +91,7 @@ describe("GET  /api/v1/user", () => {
     test("With expired session", async () => {
       jest.useFakeTimers({
         now: new Date(
-          Date.now() - session.EXPIRESATINDAYS_IN_MILLSECOND - 3600,
+          Date.now() - session.EXPIRESATINDAYS_IN_MILLSECOND - 3600 * 1000 * 24,
         ),
       });
 
@@ -132,10 +132,6 @@ describe("GET  /api/v1/user", () => {
       });
       const sessionObj = await orchestrator.createSession(createUser.id);
 
-      console.log("sessionObj:", sessionObj);
-
-      console.log("data fake:", new Date(Date.now()));
-
       const response = await fetch("http://localhost:3000/api/v1/user", {
         headers: {
           "Content-Type": "application/json",
@@ -157,7 +153,6 @@ describe("GET  /api/v1/user", () => {
       });
 
       jest.useRealTimers();
-      console.log("data atual:", new Date(Date.now()));
 
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
@@ -166,7 +161,6 @@ describe("GET  /api/v1/user", () => {
       const sessionValidUpdated = await session.findOneValidByToken(
         sessionObj.token,
       );
-      console.log("sessionValidUpdated:", sessionValidUpdated);
 
       expect(sessionValidUpdated.expires_at.getTime()).toBeGreaterThan(
         sessionObj.expires_at.getTime(),

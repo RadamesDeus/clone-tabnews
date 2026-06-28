@@ -17,7 +17,6 @@ async function getHandlerUser(request, response) {
   const sessionValid = await session.findOneValidByToken(
     request.cookies.session_id,
   );
-  console.log("sessionValid", sessionValid);
 
   const sessionUpdated = await session.updateById(sessionValid.id);
 
