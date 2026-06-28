@@ -4,6 +4,8 @@ import user from "models/user.js";
 import session from "models/session.js";
 import { faker } from "@faker-js/faker";
 
+const URLHTTPEMAIL = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`;
+
 async function cleanDatabase() {
   await database.query("drop schema public cascade; create schema public");
 }
@@ -24,11 +26,34 @@ async function createSession(userId) {
   return newSession;
 }
 
+async function deleteAllEmail() {
+  fetch(`${URLHTTPEMAIL}/messages`, {
+    method: "DELETE",
+  });
+}
+
+async function getLastEmail() {
+  const response = await fetch(`${URLHTTPEMAIL}/messages`);
+  const emails = await response.json();
+
+  const lastEmail = emails.pop(); //[emails.length - 1]
+
+  const lastEmailText = await fetch(
+    `${URLHTTPEMAIL}/messages/${lastEmail.id}.plain`,
+  );
+
+  lastEmail.text = await lastEmailText.text();
+
+  return lastEmail;
+}
+
 const orchestrator = {
   cleanDatabase,
   execPendingMigrations,
   createUser,
   createSession,
+  deleteAllEmail,
+  getLastEmail,
 };
 
 export default orchestrator;
