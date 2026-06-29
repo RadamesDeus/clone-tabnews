@@ -6,7 +6,7 @@ function getOrigin() {
   if (process.env.NODE_ENV === "production") {
     return `https://${process.env.HOST}`;
   }
-  return `http://localhost:${process.env.PORT}`;
+  return `http://localhost:3000`;
 }
 const wecserver = {
   getOrigin,
