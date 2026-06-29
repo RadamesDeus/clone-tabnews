@@ -38,6 +38,10 @@ async function getLastEmail() {
 
   const lastEmail = emails.pop(); //[emails.length - 1]
 
+  if (!lastEmail) {
+    return;
+  }
+
   const lastEmailText = await fetch(
     `${URLHTTPEMAIL}/messages/${lastEmail.id}.plain`,
   );

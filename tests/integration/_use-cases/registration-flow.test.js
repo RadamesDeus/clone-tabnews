@@ -1,11 +1,14 @@
 import orchestrator from "tests/orchestrator.js";
+import activation from "models/activation.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
   await orchestrator.execPendingMigrations();
+  await orchestrator.deleteAllEmail();
 });
 
 describe("USE case:  Registration Flow.test (all successful)", () => {
+  let userRegistrationFlow;
   test("Create user account", async () => {
     const response = await fetch("http://localhost:3000/api/v1/users", {
       method: "POST",
@@ -21,19 +24,34 @@ describe("USE case:  Registration Flow.test (all successful)", () => {
 
     expect(response.status).toBe(201);
 
-    const responseBody = await response.json();
-    expect(responseBody).toEqual({
-      id: responseBody.id,
+    userRegistrationFlow = await response.json();
+    expect(userRegistrationFlow).toEqual({
+      id: userRegistrationFlow.id,
       username: "RegistrationFlow",
       email: "registration.flow@gmail.com",
       features: ["read:activation_token"],
-      password: responseBody.password,
-      created_at: responseBody.created_at,
-      updated_at: responseBody.updated_at,
+      password: userRegistrationFlow.password,
+      created_at: userRegistrationFlow.created_at,
+      updated_at: userRegistrationFlow.updated_at,
     });
   });
 
-  test("Activate account was created", async () => {});
+  test("Activate account was created", async () => {
+    const lastEmail = await orchestrator.getLastEmail();
+
+    const activationTokenMatch = await activation.findOneByUserId(
+      userRegistrationFlow.id,
+    );
+
+    expect(lastEmail).toBeDefined();
+    expect(lastEmail.sender).toBe("<contato@clonetabnews.com.br>");
+    expect(lastEmail.recipients[0]).toBe("<registration.flow@gmail.com>");
+    expect(lastEmail.subject).toBe("Ative seu cadastro no Clone Tabnews");
+    expect(lastEmail.text).toContain(activationTokenMatch.id);
+
+    console.log(lastEmail.text);
+  });
+
   test("Login account was created", async () => {});
   test("Get User Details was created", async () => {});
 });
