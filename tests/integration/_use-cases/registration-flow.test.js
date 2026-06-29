@@ -2,6 +2,7 @@ import orchestrator from "tests/orchestrator.js";
 import activation from "models/activation.js";
 import webserver from "infra/webserver.js";
 import { NotFoundError } from "infra/errors.js";
+import user from "models/user.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -11,6 +12,8 @@ beforeAll(async () => {
 
 describe("USE case:  Registration Flow.test (all successful)", () => {
   let userRegistrationFlow;
+  let activationTokenMatch;
+
   test("Create user account", async () => {
     const response = await fetch("http://localhost:3000/api/v1/users", {
       method: "POST",
@@ -38,7 +41,7 @@ describe("USE case:  Registration Flow.test (all successful)", () => {
     });
   });
 
-  test("Activate account was created", async () => {
+  test("Receive user account was created", async () => {
     const lastEmail = await orchestrator.getLastEmail();
 
     expect(lastEmail).toBeDefined();
@@ -53,23 +56,43 @@ describe("USE case:  Registration Flow.test (all successful)", () => {
       `${webserver.getOrigin()}/cadastro/ativar/${token}`,
     );
 
-    const activationTokenMatch = await activation.findActivationByToken(token);
+    activationTokenMatch = await activation.findActivationByToken(token);
     expect(activationTokenMatch.user_id).toBe(userRegistrationFlow.id);
     expect(activationTokenMatch.used_at).toBe(null);
+  });
 
-    let erroToken;
-
-    await expect(
-      (erroToken = activation.findActivationByToken(token)),
-    ).rejects.toThrow(NotFoundError);
-
-    await expect(erroToken).rejects.toHaveProperty(
-      "action",
-      "O token de ativação não foi encontrado no sistema ou expirou.",
-      400,
-      "message",
-      "Faça um novo cadastro.",
+  test("Activate account was created", async () => {
+    const response = await fetch(
+      `http://localhost:3000/api/v1/activations/${activationTokenMatch.id}`,
+      {
+        method: "PATCH",
+      },
     );
+    expect(response.status).toBe(200);
+
+    const responseBody = await response.json();
+    expect(Date.parse(responseBody.used_at)).not.toBeNaN();
+
+    const userActive = await user.findOneById(activationTokenMatch.user_id);
+
+    expect(userActive.features).not.toContain("read:activation_token");
+    expect(userActive.features).toContain("create:session");
+
+    const response2 = await fetch(
+      `http://localhost:3000/api/v1/activations/${activationTokenMatch.id}`,
+      {
+        method: "PATCH",
+      },
+    );
+    expect(response2.status).toBe(404);
+
+    const response2Body = await response2.json();
+    expect(response2Body).toEqual({
+      name: "NotFoundError",
+      action: "O token de ativação não foi encontrado no sistema ou expirou.",
+      message: "Faça um novo cadastro.",
+      status_code: 404,
+    });
   });
 
   test("Login account was created", async () => {});

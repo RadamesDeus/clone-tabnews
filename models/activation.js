@@ -2,6 +2,7 @@ import email from "infra/email.js";
 import database from "infra/database.js";
 import webserver from "infra/webserver.js";
 import { NotFoundError } from "infra/errors.js";
+import user from "models/user.js";
 
 const EXPIRE_TOKENS_AT_IN_MILLISECONDS = 60 * 15 * 1000; //15 minutes
 
@@ -16,21 +17,12 @@ async function create(userId) {
   return result.rows[0];
 }
 
-// async function findOneByUserId(userId) {
-//   const result = await database.query({
-//     text: `SELECT * FROM user_activation_tokens WHERE user_id = $1;`,
-//     values: [userId],
-//   });
-
-//   return result.rows[0];
-// }
-
-async function sendEmailToUser(user, token) {
+async function sendEmailToUser(userSend, token) {
   await email.sendEmail({
     from: "Clone Tabnews <contato@clonetabnews.com.br>",
-    to: `${user.username} <${user.email}>`,
+    to: `${userSend.userSendname} <${userSend.email}>`,
     subject: "Ative seu cadastro no Clone Tabnews",
-    text: `Olá, ${user.username}! Para ativar sua conta, clique no link abaixo:
+    text: `Olá, ${userSend.username}! Para ativar sua conta, clique no link abaixo:
 
 ${webserver.getOrigin()}/cadastro/ativar/${token}
 
@@ -60,10 +52,12 @@ async function findActivationByToken(token) {
     });
   }
 
-  const userActivationToken = result.rows[0];
-  await markTokenAsUsed(userActivationToken.id);
+  return result.rows[0];
+}
 
-  return userActivationToken;
+async function createSessionUser(userId) {
+  const features = ["create:session"];
+  await user.setFeatures(userId, features);
 }
 
 async function markTokenAsUsed(id) {
@@ -86,6 +80,7 @@ const activation = {
   create,
   findActivationByToken,
   markTokenAsUsed,
+  createSessionUser,
 };
 
 export default activation;
