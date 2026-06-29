@@ -5,6 +5,8 @@ import {
   onError,
   setSessionCookie,
   cleanSessionCookie,
+  injectAnonymousOrUser,
+  canRequest,
 } from "infra/controller";
 
 import autentication from "models/autentication.js";
@@ -12,7 +14,8 @@ import session from "models/session.js";
 
 const router = createRouter();
 
-router.post(postHandlerSessions);
+router.use(injectAnonymousOrUser);
+router.post(canRequest("create:session"), postHandlerSessions);
 router.delete(deleteHandlerSessions);
 
 export default router.handler({
@@ -22,6 +25,7 @@ export default router.handler({
 
 async function postHandlerSessions(request, response) {
   const userData = request.body; //JSON.parse(request.body);
+  console.log("request.context", request.context);
 
   const user = await autentication.getAutenticationUser(
     userData.email,

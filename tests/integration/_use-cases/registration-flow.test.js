@@ -1,7 +1,6 @@
 import orchestrator from "tests/orchestrator.js";
 import activation from "models/activation.js";
 import webserver from "infra/webserver.js";
-import { NotFoundError } from "infra/errors.js";
 import user from "models/user.js";
 
 beforeAll(async () => {
@@ -95,6 +94,23 @@ describe("USE case:  Registration Flow.test (all successful)", () => {
     });
   });
 
-  test("Login account was created", async () => {});
+  test("Login account was created", async () => {
+    const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: "registration.flow@gmail.com",
+        password: "RegistrationFlowPassword",
+      }),
+    });
+
+    expect(response.status).toBe(201);
+
+    const bodyResponse = await response.json();
+    expect(bodyResponse.user_id).toBe(userRegistrationFlow.id);
+  });
+
   test("Get User Details was created", async () => {});
 });

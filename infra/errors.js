@@ -35,6 +35,26 @@ export class ValidationError extends Error {
   }
 }
 
+export class ForbiddenError extends Error {
+  constructor({ action, cause, status_code, message }) {
+    super("Usuário não autorizado.", { cause });
+    this.name = "ForbiddenError";
+    this.action =
+      action || "verifique se o usuario tem a feature para o acesso";
+    this.message = message || `Usuário não autorizado.`;
+    this.status_code = status_code || 403;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.status_code,
+    };
+  }
+}
+
 export class UnauthorizedError extends Error {
   constructor({ action, cause, status_code, message }) {
     super("Usuário não autorizado.", { cause });

@@ -6,8 +6,10 @@ import {
   ValidationError,
   NotFoundError,
   UnauthorizedError,
+  ForbiddenError,
 } from "infra/errors.js";
 import session from "models/session.js";
+import user from "models/user.js";
 
 export function onNoMatch(req, res) {
   const publicErroObject = new MethodNotAllowedError();
@@ -15,7 +17,11 @@ export function onNoMatch(req, res) {
   res.status(publicErroObject.status_code).json(publicErroObject);
 }
 export function onError(err, req, res) {
-  if (err instanceof ValidationError || err instanceof NotFoundError) {
+  if (
+    err instanceof ValidationError ||
+    err instanceof NotFoundError ||
+    err instanceof ForbiddenError
+  ) {
     return res.status(err.status_code).json(err);
   }
 
@@ -51,4 +57,41 @@ export function cleanSessionCookie(response) {
   });
 
   response.setHeader("Set-Cookie", setCookes);
+}
+
+export async function injectAnonymousOrUser(request, response, next) {
+  if (request.cookies?.session_id) await injectUserAutheticated(request);
+  else await injectUserAnonymous(request);
+
+  return next();
+}
+
+async function injectUserAutheticated(request) {
+  const sessionToken = request.cookies.session_id;
+  const sessionValid = await session.findOneValidByToken(sessionToken);
+  const userObject = await user.findOneById(sessionValid.user_id);
+  request.context = {
+    ...request.context,
+    user: userObject,
+  };
+}
+
+async function injectUserAnonymous(request) {
+  request.context = {
+    ...request.context,
+    user: {
+      features: ["read:activation_token", "create:session", "create:user"],
+    },
+  };
+}
+
+export function canRequest(feature) {
+  return function canRequestMiddlewere(request, response, next) {
+    if (request.context.user.features.includes(feature)) return next();
+
+    throw new ForbiddenError({
+      message: `O usuário não possui permissão para executar esta ação.`,
+      action: `Verifique se o seu usuário possui a feature [${feature}]`,
+    });
+  };
 }
