@@ -10,6 +10,7 @@ import {
 } from "infra/errors.js";
 import session from "models/session.js";
 import user from "models/user.js";
+import authorization from "models/authorization.js";
 
 export function onNoMatch(req, res) {
   const publicErroObject = new MethodNotAllowedError();
@@ -86,8 +87,13 @@ async function injectUserAnonymous(request) {
 }
 
 export function canRequest(feature) {
-  return function canRequestMiddlewere(request, response, next) {
-    if (request.context.user.features.includes(feature)) return next();
+  return async function canRequestMiddlewere(request, response, next) {
+    const canRequest = await authorization.can(
+      request.context.user.features,
+      feature,
+    );
+
+    if (canRequest) return next();
 
     throw new ForbiddenError({
       message: `O usuário não possui permissão para executar esta ação.`,

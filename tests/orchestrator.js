@@ -23,6 +23,7 @@ async function createUser(newUser) {
 
 async function createSession(userId) {
   const newSession = await session.create(userId);
+  // await user.setFeatures(userId, ["create:session"]);
   return newSession;
 }
 
@@ -51,6 +52,11 @@ async function getLastEmail() {
   return lastEmail;
 }
 
+async function activateUser(userId) {
+  const features = ["create:session"];
+  return await user.setFeatures(userId, features);
+}
+
 const orchestrator = {
   cleanDatabase,
   execPendingMigrations,
@@ -58,6 +64,7 @@ const orchestrator = {
   createSession,
   deleteAllEmail,
   getLastEmail,
+  activateUser,
 };
 
 export default orchestrator;

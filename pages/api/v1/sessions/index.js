@@ -1,5 +1,4 @@
 import { createRouter } from "next-connect";
-
 import {
   onNoMatch,
   onError,
@@ -9,8 +8,10 @@ import {
   canRequest,
 } from "infra/controller";
 
-import autentication from "models/autentication.js";
+import authentication from "models/authentication.js";
+import authorization from "models/authorization.js";
 import session from "models/session.js";
+import { ForbiddenError } from "infra/errors.js";
 
 const router = createRouter();
 
@@ -25,12 +26,20 @@ export default router.handler({
 
 async function postHandlerSessions(request, response) {
   const userData = request.body; //JSON.parse(request.body);
-  console.log("request.context", request.context);
 
-  const user = await autentication.getAutenticationUser(
+  const user = await authentication.getAuthenticationUser(
     userData.email,
     userData.password,
   );
+
+  const authorizated = await authorization.can(user.features, "create:session");
+
+  if (!authorizated)
+    throw new ForbiddenError({
+      message: `O usuário não possui permissão para executar esta ação.`,
+      action: `Verifique se o seu usuário possui a feature`,
+    });
+
   const newSession = await session.create(user.id);
 
   setSessionCookie(response, newSession.token);

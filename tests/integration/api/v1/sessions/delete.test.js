@@ -89,7 +89,7 @@ describe("DELETE  /api/v1/sessions", () => {
     test("Delete With expired session", async () => {
       jest.useFakeTimers({
         now: new Date(
-          Date.now() - session.EXPIRESATINDAYS_IN_MILLSECOND - 10000,
+          Date.now() - session.EXPIRESATINDAYS_IN_MILLSECOND - 100000,
         ),
       });
 

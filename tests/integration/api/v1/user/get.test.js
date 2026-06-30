@@ -122,9 +122,11 @@ describe("GET  /api/v1/user", () => {
     });
 
     test("With session about to expire", async () => {
-      const createUser = await orchestrator.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "UserWithAboutToExpireSession",
       });
+
+      const createUser = await orchestrator.activateUser(createdUser.id);
 
       jest.useFakeTimers({
         now: new Date(
@@ -148,7 +150,7 @@ describe("GET  /api/v1/user", () => {
         id: createUser.id,
         username: "UserWithAboutToExpireSession",
         email: createUser.email,
-        features: ["read:activation_token"],
+        features: ["create:session"],
         password: createUser.password,
         created_at: createUser.created_at.toISOString(),
         updated_at: createUser.updated_at.toISOString(),
