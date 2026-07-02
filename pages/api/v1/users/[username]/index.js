@@ -4,8 +4,8 @@ import user from "models/user.js";
 
 const router = createRouter();
 router.use(controller.injectAnonymousOrUser);
-router.get(controller.canRequest("read:session"), getHandlerUsers);
-router.patch(patchHandlerUsers);
+router.get(controller.canRequest("read:user"), getHandlerUsers);
+router.patch(controller.canRequest("update:user"), patchHandlerUsers);
 
 export default router.handler({
   onNoMatch,

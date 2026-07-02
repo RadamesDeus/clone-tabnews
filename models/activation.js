@@ -77,7 +77,12 @@ async function activateUserbyUserId(userId) {
     });
   }
 
-  const features = ["create:session", "read:session"];
+  const features = [
+    "create:session",
+    "read:session",
+    "update:user",
+    "read:user",
+  ];
   await user.setFeatures(userId, features);
 }
 
