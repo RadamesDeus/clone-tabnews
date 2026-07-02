@@ -1,11 +1,11 @@
 import { createRouter } from "next-connect";
-import { onNoMatch, onError } from "infra/controller";
+import controller, { onNoMatch, onError } from "infra/controller";
 import user from "models/user.js";
 import activation from "models/activation.js";
 
 const router = createRouter();
-
-router.post(postHandlerUsers);
+router.use(controller.injectAnonymousOrUser);
+router.post(controller.canRequest("create:user"), postHandlerUsers);
 
 export default router.handler({
   onNoMatch,

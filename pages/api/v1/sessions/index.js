@@ -1,12 +1,5 @@
 import { createRouter } from "next-connect";
-import {
-  onNoMatch,
-  onError,
-  setSessionCookie,
-  cleanSessionCookie,
-  injectAnonymousOrUser,
-  canRequest,
-} from "infra/controller";
+import controller, { onNoMatch, onError } from "infra/controller";
 
 import authentication from "models/authentication.js";
 import authorization from "models/authorization.js";
@@ -15,8 +8,8 @@ import { ForbiddenError } from "infra/errors.js";
 
 const router = createRouter();
 
-router.use(injectAnonymousOrUser);
-router.post(canRequest("create:session"), postHandlerSessions);
+router.use(controller.injectAnonymousOrUser);
+router.post(controller.canRequest("create:session"), postHandlerSessions);
 router.delete(deleteHandlerSessions);
 
 export default router.handler({
@@ -42,7 +35,7 @@ async function postHandlerSessions(request, response) {
 
   const newSession = await session.create(user.id);
 
-  setSessionCookie(response, newSession.token);
+  controller.setSessionCookie(response, newSession.token);
 
   response.status(201).json(newSession);
 }
@@ -52,6 +45,6 @@ async function deleteHandlerSessions(request, response) {
     request.cookies.session_id,
   );
   const sessionValidUpdated = await session.expireById(sessionValid.id);
-  cleanSessionCookie(response);
+  controller.cleanSessionCookie(response);
   return response.status(200).json(sessionValidUpdated);
 }

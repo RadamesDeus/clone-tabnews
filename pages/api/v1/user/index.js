@@ -1,12 +1,13 @@
 import { createRouter } from "next-connect";
 
-import { onNoMatch, onError, setSessionCookie } from "infra/controller";
+import controller, { onNoMatch, onError } from "infra/controller";
 import session from "models/session.js";
 import user from "models/user.js";
 
 const router = createRouter();
 
-router.get(getHandlerUser);
+router.use(controller.injectAnonymousOrUser);
+router.get(controller.canRequest("read:session"), getHandlerUser);
 
 export default router.handler({
   onNoMatch,
@@ -22,7 +23,7 @@ async function getHandlerUser(request, response) {
 
   const userFound = await user.findOneById(sessionUpdated.user_id);
 
-  setSessionCookie(response, sessionUpdated.token);
+  controller.setSessionCookie(response, sessionUpdated.token);
 
   response.setHeader(
     "Cache-Control",

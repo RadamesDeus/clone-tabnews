@@ -63,12 +63,12 @@ export function cleanSessionCookie(response) {
 export async function injectAnonymousOrUser(request, response, next) {
   if (request.cookies?.session_id) await injectUserAutheticated(request);
   else await injectUserAnonymous(request);
-
   return next();
 }
 
 async function injectUserAutheticated(request) {
   const sessionToken = request.cookies.session_id;
+
   const sessionValid = await session.findOneValidByToken(sessionToken);
   const userObject = await user.findOneById(sessionValid.user_id);
   request.context = {
@@ -101,3 +101,12 @@ export function canRequest(feature) {
     });
   };
 }
+
+const controller = {
+  setSessionCookie,
+  cleanSessionCookie,
+  injectAnonymousOrUser,
+  canRequest,
+};
+
+export default controller;

@@ -53,7 +53,7 @@ async function getLastEmail() {
 }
 
 async function activateUser(userId) {
-  const features = ["create:session"];
+  const features = ["create:session", "read:session"];
   return await user.setFeatures(userId, features);
 }
 

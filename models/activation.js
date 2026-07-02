@@ -1,8 +1,10 @@
 import email from "infra/email.js";
 import database from "infra/database.js";
 import webserver from "infra/webserver.js";
-import { NotFoundError } from "infra/errors.js";
+import { NotFoundError, ForbiddenError } from "infra/errors.js";
 import user from "models/user.js";
+import authorization from "models/authorization.js";
+import { validate } from "uuid";
 
 const EXPIRE_TOKENS_AT_IN_MILLISECONDS = 60 * 15 * 1000; //15 minutes
 
@@ -33,6 +35,15 @@ Equipe Clone Tabnews`,
   });
 }
 async function findActivationByToken(token) {
+  const NotFoundErrorObject = new NotFoundError({
+    action: "O token de ativação não foi encontrado no sistema ou expirou.",
+    message: "Faça um novo cadastro.",
+  });
+
+  if (!validate(token)) {
+    throw new NotFoundError(NotFoundErrorObject);
+  }
+
   const result = await database.query({
     text: `SELECT 
             * 
@@ -46,17 +57,27 @@ async function findActivationByToken(token) {
   });
 
   if (result.rowCount === 0) {
-    throw new NotFoundError({
-      action: "O token de ativação não foi encontrado no sistema ou expirou.",
-      message: "Faça um novo cadastro.",
-    });
+    throw new NotFoundError(NotFoundErrorObject);
   }
 
   return result.rows[0];
 }
 
-async function createSessionUser(userId) {
-  const features = ["create:session"];
+async function activateUserbyUserId(userId) {
+  const userToActivate = await user.findOneById(userId);
+  const isauthorizated = await authorization.can(
+    userToActivate.features,
+    "read:activation_token",
+  );
+
+  if (!isauthorizated) {
+    throw new ForbiddenError({
+      message: `O usuário não possui token de ativação.`,
+      action: `Entre em contato com o suporte do sistema.`,
+    });
+  }
+
+  const features = ["create:session", "read:session"];
   await user.setFeatures(userId, features);
 }
 
@@ -80,7 +101,8 @@ const activation = {
   create,
   findActivationByToken,
   markTokenAsUsed,
-  createSessionUser,
+  activateUserbyUserId,
+  EXPIRE_TOKENS_AT_IN_MILLISECONDS,
 };
 
 export default activation;

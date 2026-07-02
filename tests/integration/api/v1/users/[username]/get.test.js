@@ -9,11 +9,14 @@ beforeAll(async () => {
 describe("GET  /api/v1/users/[username]", () => {
   describe("Anonynous user", () => {
     test("With exact case match `username`", async () => {
-      await orchestrator.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "MesmoCase",
         email: "MesmoCase@gmail.com",
         password: "123475",
       });
+
+      await orchestrator.activateUser(createdUser.id);
+      const sessionObj = await orchestrator.createSession(createdUser.id);
 
       const response1 = await fetch(
         "http://localhost:3000/api/v1/users/MesmoCase",
@@ -21,6 +24,7 @@ describe("GET  /api/v1/users/[username]", () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObj.token}`,
           },
         },
       );
@@ -31,7 +35,7 @@ describe("GET  /api/v1/users/[username]", () => {
         id: responseBody.id,
         username: "MesmoCase",
         email: "MesmoCase@gmail.com",
-        features: ["read:activation_token"],
+        features: ["create:session", "read:session"],
         password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -39,11 +43,14 @@ describe("GET  /api/v1/users/[username]", () => {
     });
 
     test("With case mismatch `username`", async () => {
-      await orchestrator.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "caseMismatch",
         email: "caseMismatch@gmail.com",
         password: "123475",
       });
+
+      await orchestrator.activateUser(createdUser.id);
+      const sessionObj = await orchestrator.createSession(createdUser.id);
 
       const response1 = await fetch(
         "http://localhost:3000/api/v1/users/casemismatch",
@@ -51,6 +58,7 @@ describe("GET  /api/v1/users/[username]", () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObj.token}`,
           },
         },
       );
@@ -61,7 +69,7 @@ describe("GET  /api/v1/users/[username]", () => {
         id: responseBody.id,
         username: "caseMismatch",
         email: "caseMismatch@gmail.com",
-        features: ["read:activation_token"],
+        features: ["create:session", "read:session"],
         password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -78,7 +86,7 @@ describe("GET  /api/v1/users/[username]", () => {
           },
         },
       );
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(403);
     });
   });
 });

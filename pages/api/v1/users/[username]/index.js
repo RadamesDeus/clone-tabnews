@@ -1,10 +1,10 @@
 import { createRouter } from "next-connect";
-import { onNoMatch, onError } from "infra/controller";
+import controller, { onNoMatch, onError } from "infra/controller";
 import user from "models/user.js";
 
 const router = createRouter();
-
-router.get(getHandlerUsers);
+router.use(controller.injectAnonymousOrUser);
+router.get(controller.canRequest("read:session"), getHandlerUsers);
 router.patch(patchHandlerUsers);
 
 export default router.handler({
@@ -16,6 +16,7 @@ async function getHandlerUsers(request, response) {
   const username = request.query?.username;
 
   const userItem = await user.findByUsername(username);
+
   return response.status(200).json(userItem);
 }
 

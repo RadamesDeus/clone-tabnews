@@ -1,10 +1,10 @@
 import { createRouter } from "next-connect";
-import { onNoMatch, onError } from "infra/controller";
+import controller, { onNoMatch, onError } from "infra/controller";
 import activation from "models/activation.js";
 
 const router = createRouter();
-
-router.patch(patchHandlerToken);
+router.use(controller.injectAnonymousOrUser);
+router.patch(controller.canRequest("read:activation_token"), patchHandlerToken);
 
 export default router.handler({
   onNoMatch,
@@ -15,8 +15,8 @@ async function patchHandlerToken(request, response) {
   const token = request.query?.token;
 
   const activationTokenMatch = await activation.findActivationByToken(token);
+  await activation.activateUserbyUserId(activationTokenMatch.user_id);
   const activationTokenUsed = await activation.markTokenAsUsed(token);
-  await activation.createSessionUser(activationTokenMatch.user_id);
 
   return response.status(200).json(activationTokenUsed);
 }
