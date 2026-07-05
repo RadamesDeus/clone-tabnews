@@ -3,6 +3,7 @@ import migrator from "models/migrator.js";
 import user from "models/user.js";
 import session from "models/session.js";
 import { faker } from "@faker-js/faker";
+import { Permissions } from "infra/rule.js";
 
 const URLHTTPEMAIL = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`;
 
@@ -54,10 +55,10 @@ async function getLastEmail() {
 
 async function activateUser(userId) {
   const features = [
-    "create:session",
-    "read:session",
-    "update:user",
-    "read:user",
+    Permissions.SESSION_CREATE,
+    Permissions.SESSION_READ,
+    Permissions.USER_READ,
+    Permissions.USER_UPDATE,
   ];
   return await user.setFeatures(userId, features);
 }

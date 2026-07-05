@@ -1,5 +1,5 @@
 import * as cookie from "cookie";
-
+import { Permissions } from "infra/rule.js";
 import {
   InternalServerError,
   MethodNotAllowedError,
@@ -81,17 +81,18 @@ async function injectUserAnonymous(request) {
   request.context = {
     ...request.context,
     user: {
-      features: ["read:activation_token", "create:session", "create:user"],
+      features: [
+        Permissions.ACTIVATION_TOKEN,
+        Permissions.SESSION_CREATE,
+        Permissions.USER_CREATE,
+      ],
     },
   };
 }
 
 export function canRequest(feature) {
   return async function canRequestMiddlewere(request, response, next) {
-    const canRequest = await authorization.can(
-      request.context.user.features,
-      feature,
-    );
+    const canRequest = await authorization.can(request.context.user, feature);
 
     if (canRequest) return next();
 

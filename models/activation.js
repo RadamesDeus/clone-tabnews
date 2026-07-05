@@ -1,4 +1,5 @@
 import email from "infra/email.js";
+import { Permissions } from "infra/rule.js";
 import database from "infra/database.js";
 import webserver from "infra/webserver.js";
 import { NotFoundError, ForbiddenError } from "infra/errors.js";
@@ -66,8 +67,8 @@ async function findActivationByToken(token) {
 async function activateUserbyUserId(userId) {
   const userToActivate = await user.findOneById(userId);
   const isauthorizated = await authorization.can(
-    userToActivate.features,
-    "read:activation_token",
+    userToActivate,
+    Permissions.ACTIVATION_TOKEN,
   );
 
   if (!isauthorizated) {
@@ -78,10 +79,10 @@ async function activateUserbyUserId(userId) {
   }
 
   const features = [
-    "create:session",
-    "read:session",
-    "update:user",
-    "read:user",
+    Permissions.SESSION_CREATE,
+    Permissions.SESSION_READ,
+    Permissions.USER_READ,
+    Permissions.USER_UPDATE,
   ];
   await user.setFeatures(userId, features);
 }

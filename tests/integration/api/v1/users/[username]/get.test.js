@@ -1,5 +1,5 @@
 import orchestrator from "tests/orchestrator.js";
-// import database from "infra/database.js";
+import { Permissions } from "infra/rule.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -36,10 +36,10 @@ describe("GET  /api/v1/users/[username]", () => {
         username: "MesmoCase",
         email: "MesmoCase@gmail.com",
         features: [
-          "create:session",
-          "read:session",
-          "update:user",
-          "read:user",
+          Permissions.SESSION_CREATE,
+          Permissions.SESSION_READ,
+          Permissions.USER_READ,
+          Permissions.USER_UPDATE,
         ],
         password: responseBody.password,
         created_at: responseBody.created_at,
@@ -75,10 +75,10 @@ describe("GET  /api/v1/users/[username]", () => {
         username: "caseMismatch",
         email: "caseMismatch@gmail.com",
         features: [
-          "create:session",
-          "read:session",
-          "update:user",
-          "read:user",
+          Permissions.SESSION_CREATE,
+          Permissions.SESSION_READ,
+          Permissions.USER_READ,
+          Permissions.USER_UPDATE,
         ],
         password: responseBody.password,
         created_at: responseBody.created_at,

@@ -2,6 +2,7 @@ import orchestrator from "tests/orchestrator.js";
 import activation from "models/activation.js";
 import webserver from "infra/webserver.js";
 import user from "models/user.js";
+import { Permissions } from "infra/rule.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -33,7 +34,7 @@ describe("USE case:  Registration Flow.test (all successful)", () => {
       id: userRegistrationFlow.id,
       username: "RegistrationFlow",
       email: "registration.flow@gmail.com",
-      features: ["read:activation_token"],
+      features: [Permissions.ACTIVATION_TOKEN],
       password: userRegistrationFlow.password,
       created_at: userRegistrationFlow.created_at,
       updated_at: userRegistrationFlow.updated_at,
@@ -74,8 +75,8 @@ describe("USE case:  Registration Flow.test (all successful)", () => {
 
     const userActive = await user.findOneById(activationTokenMatch.user_id);
 
-    expect(userActive.features).not.toContain("read:activation_token");
-    expect(userActive.features).toContain("create:session");
+    expect(userActive.features).not.toContain(Permissions.ACTIVATION_TOKEN);
+    expect(userActive.features).toContain(Permissions.SESSION_CREATE);
 
     const response2 = await fetch(
       `http://localhost:3000/api/v1/activations/${activationTokenMatch.id}`,

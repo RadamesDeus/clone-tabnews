@@ -1,5 +1,6 @@
 import { createRouter } from "next-connect";
 import controller, { onNoMatch, onError } from "infra/controller";
+import { Permissions } from "infra/rule.js";
 
 import authentication from "models/authentication.js";
 import authorization from "models/authorization.js";
@@ -9,7 +10,10 @@ import { ForbiddenError } from "infra/errors.js";
 const router = createRouter();
 
 router.use(controller.injectAnonymousOrUser);
-router.post(controller.canRequest("create:session"), postHandlerSessions);
+router.post(
+  controller.canRequest(Permissions.SESSION_CREATE),
+  postHandlerSessions,
+);
 router.delete(deleteHandlerSessions);
 
 export default router.handler({
@@ -25,7 +29,10 @@ async function postHandlerSessions(request, response) {
     userData.password,
   );
 
-  const authorizated = await authorization.can(user.features, "create:session");
+  const authorizated = await authorization.can(
+    user,
+    Permissions.SESSION_CREATE,
+  );
 
   if (!authorizated)
     throw new ForbiddenError({

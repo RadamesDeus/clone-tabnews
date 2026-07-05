@@ -3,6 +3,7 @@ import { version as uuidVersion } from "uuid";
 import activation from "models/activation";
 import orchestrator from "tests/orchestrator.js";
 import user from "models/user";
+import { Permissions } from "infra/rule.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -124,10 +125,10 @@ describe("PATCH:  /api/v1/activations/:token", () => {
     );
     const userActivated = await user.findOneById(userValid.id);
     expect(userActivated.features).toEqual([
-      "create:session",
-      "read:session",
-      "update:user",
-      "read:user",
+      Permissions.SESSION_CREATE,
+      Permissions.SESSION_READ,
+      Permissions.USER_READ,
+      Permissions.USER_UPDATE,
     ]);
   });
 

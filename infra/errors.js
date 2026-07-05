@@ -21,7 +21,7 @@ export class ValidationError extends Error {
     super("Ocorreu um erro de validação.", { cause });
     this.name = "ValidationError";
     this.action = action || "entre em contato com suport.";
-    this.message = message || "Erro ao execultar essa operação.";
+    this.message = message || "Erro ao executar essa operação.";
     this.status_code = status_code || 400;
   }
 

@@ -2,6 +2,7 @@ import orchestrator from "tests/orchestrator.js";
 import session from "models/session";
 import { version as uuidVersion } from "uuid";
 import setCookiePparser from "set-cookie-parser";
+import { Permissions } from "infra/rule.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -19,7 +20,7 @@ describe("GET  /api/v1/user", () => {
       expect(responseBody).toEqual({
         name: "ForbiddenError",
         message: "O usuário não possui permissão para executar esta ação.",
-        action: "Verifique se o seu usuário possui a feature [read:session]",
+        action: `Verifique se o seu usuário possui a feature [${Permissions.SESSION_READ}]`,
         status_code: 403,
       });
     });
@@ -48,10 +49,10 @@ describe("GET  /api/v1/user", () => {
         username: "UserWithValidSession",
         email: createUser.email,
         features: [
-          "create:session",
-          "read:session",
-          "update:user",
-          "read:user",
+          Permissions.SESSION_CREATE,
+          Permissions.SESSION_READ,
+          Permissions.USER_READ,
+          Permissions.USER_UPDATE,
         ],
         password: createUser.password,
         created_at: createUser.created_at.toISOString(),
@@ -172,10 +173,10 @@ describe("GET  /api/v1/user", () => {
         username: "UserWithAboutToExpireSession",
         email: createUser.email,
         features: [
-          "create:session",
-          "read:session",
-          "update:user",
-          "read:user",
+          Permissions.SESSION_CREATE,
+          Permissions.SESSION_READ,
+          Permissions.USER_READ,
+          Permissions.USER_UPDATE,
         ],
         password: createUser.password,
         created_at: createUser.created_at.toISOString(),

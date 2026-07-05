@@ -1,6 +1,7 @@
 import database from "infra/database.js";
 import password from "models/password.js";
 import { ValidationError, NotFoundError } from "infra/errors.js";
+import { Permissions } from "infra/rule.js";
 
 async function create(userInputValues) {
   await getEmailDuplicate(userInputValues.email);
@@ -39,7 +40,7 @@ async function getEmailDuplicate(email) {
     throw new ValidationError({
       cause: "Email já cadastrado.",
       action: "Utilize outro email para essa operação.",
-      message: "Erro ao execultar essa operação.",
+      message: "Erro ao executar essa operação.",
       status_code: 400,
     });
   }
@@ -107,7 +108,7 @@ async function findByEmail(email) {
 }
 
 async function inputDeafaultFeaturesInObhect(userInputValues) {
-  userInputValues.features = ["read:activation_token"];
+  userInputValues.features = [Permissions.ACTIVATION_TOKEN];
 }
 
 async function update(username, userInputValue) {

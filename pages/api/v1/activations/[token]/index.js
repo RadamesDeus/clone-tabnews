@@ -1,10 +1,14 @@
 import { createRouter } from "next-connect";
 import controller, { onNoMatch, onError } from "infra/controller";
 import activation from "models/activation.js";
+import { Permissions } from "infra/rule.js";
 
 const router = createRouter();
 router.use(controller.injectAnonymousOrUser);
-router.patch(controller.canRequest("read:activation_token"), patchHandlerToken);
+router.patch(
+  controller.canRequest(Permissions.ACTIVATION_TOKEN),
+  patchHandlerToken,
+);
 
 export default router.handler({
   onNoMatch,

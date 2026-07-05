@@ -2,6 +2,7 @@ import { version as uuidVersion } from "uuid";
 import orchestrator from "tests/orchestrator.js";
 import user from "models/user";
 import password from "models/password";
+import { Permissions } from "infra/rule.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -30,7 +31,7 @@ describe("POST  /api/v1/users", () => {
         id: responseBody.id,
         username: "testuser",
         email: "rainbow@gmail.com",
-        features: ["read:activation_token"],
+        features: [Permissions.ACTIVATION_TOKEN],
         password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -83,7 +84,7 @@ describe("POST  /api/v1/users", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "Erro ao execultar essa operação.",
+        message: "Erro ao executar essa operação.",
         action: "Utilize outro email para essa operação.",
         status_code: 400,
       });

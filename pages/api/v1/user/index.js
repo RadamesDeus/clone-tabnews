@@ -3,11 +3,12 @@ import { createRouter } from "next-connect";
 import controller, { onNoMatch, onError } from "infra/controller";
 import session from "models/session.js";
 import user from "models/user.js";
+import { Permissions } from "infra/rule.js";
 
 const router = createRouter();
 
 router.use(controller.injectAnonymousOrUser);
-router.get(controller.canRequest("read:session"), getHandlerUser);
+router.get(controller.canRequest(Permissions.SESSION_READ), getHandlerUser);
 
 export default router.handler({
   onNoMatch,

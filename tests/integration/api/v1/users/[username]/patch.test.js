@@ -2,6 +2,7 @@ import { version as uuidVersion } from "uuid";
 import orchestrator from "tests/orchestrator.js";
 import user from "models/user";
 import password from "models/password";
+import { Permissions } from "infra/rule.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -33,7 +34,7 @@ describe("PATCH  /api/v1/users/[username]", () => {
       const responseUp_usernameBody = await responseUp_username.json();
 
       expect(responseUp_usernameBody).toEqual({
-        action: "Verifique se o seu usuário possui a feature [update:user]",
+        action: `Verifique se o seu usuário possui a feature [${Permissions.USER_UPDATE}]`,
         message: "O usuário não possui permissão para executar esta ação.",
         name: "ForbiddenError",
         status_code: 403,
@@ -67,17 +68,11 @@ describe("PATCH  /api/v1/users/[username]", () => {
       expect(response.status).toBe(404);
     });
 
-    test("With noupdate username duplicate", async () => {
-      const createdUser1 = await orchestrator.createUser({
-        username: "user1",
-      });
-
-      const createdUser2 = await orchestrator.createUser({
-        username: "user2",
-      });
+    test("With no update username duplicate", async () => {
+      const createdUser1 = await orchestrator.createUser({});
+      const createdUser2 = await orchestrator.createUser({});
 
       const activatedUser2 = await orchestrator.activateUser(createdUser2.id);
-
       const sessionObj = await orchestrator.createSession(activatedUser2.id);
 
       const responseUp_username = await fetch(
@@ -105,7 +100,39 @@ describe("PATCH  /api/v1/users/[username]", () => {
       });
     });
 
-    test("With noupdate email duplicate", async () => {
+    test("With no update username the another user", async () => {
+      const createdUser1 = await orchestrator.createUser({});
+      const createdUser2 = await orchestrator.createUser({});
+
+      const activatedUser2 = await orchestrator.activateUser(createdUser2.id);
+      const sessionObj = await orchestrator.createSession(activatedUser2.id);
+
+      const responseUp_username = await fetch(
+        `http://localhost:3000/api/v1/users/${createdUser1.username}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObj.token}`,
+          },
+          body: JSON.stringify({
+            username: `umUsuarioQualquer`,
+          }),
+        },
+      );
+
+      expect(responseUp_username.status).toBe(403);
+
+      const responseUp_usernameBody = await responseUp_username.json();
+      expect(responseUp_usernameBody).toEqual({
+        name: "ForbiddenError",
+        action: `Verifique se o seu usuário possui a feature [${Permissions.USER_UPDATE}]`,
+        message: "O usuário não possui permissão para executar esta ação.",
+        status_code: 403,
+      });
+    });
+
+    test("With no update email duplicate", async () => {
       const createdUser1 = await orchestrator.createUser({
         email: "useremail1@gmail.com",
       });
@@ -138,7 +165,7 @@ describe("PATCH  /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         name: "ValidationError",
         action: "Utilize outro email para essa operação.",
-        message: "Erro ao execultar essa operação.",
+        message: "Erro ao executar essa operação.",
         status_code: 400,
       });
     });
@@ -167,19 +194,24 @@ describe("PATCH  /api/v1/users/[username]", () => {
 
       expect(responseUp_username.status).toBe(200);
 
-      // const responseUp_usernameBody = await responseUp_username.json();
-      // expect(responseUp_usernameBody).toEqual({
-      //   id: responseUp_usernameBody.id,
-      //   username: "User3Valid",
-      //   email: responseUp_usernameBody.email,
-      //   features: ["create:session", "read:session", "update:user",  "read:user"],
-      //   password: responseUp_usernameBody.password,
-      //   created_at: responseUp_usernameBody.created_at,
-      //   updated_at: responseUp_usernameBody.updated_at,
-      // });
-      // expect(responseUp_usernameBody.updated_at).not.toBe(
-      //   responseUp_usernameBody.created_at,
-      // );
+      const responseUp_usernameBody = await responseUp_username.json();
+      expect(responseUp_usernameBody).toEqual({
+        id: responseUp_usernameBody.id,
+        username: "usernameValid3",
+        email: responseUp_usernameBody.email,
+        features: [
+          Permissions.SESSION_CREATE,
+          Permissions.SESSION_READ,
+          Permissions.USER_READ,
+          Permissions.USER_UPDATE,
+        ],
+        password: responseUp_usernameBody.password,
+        created_at: responseUp_usernameBody.created_at,
+        updated_at: responseUp_usernameBody.updated_at,
+      });
+      expect(responseUp_usernameBody.updated_at).not.toBe(
+        responseUp_usernameBody.created_at,
+      );
     });
 
     test("With update email valid", async () => {
@@ -212,10 +244,10 @@ describe("PATCH  /api/v1/users/[username]", () => {
         username: responseBody.username,
         email: "User4Valid@gmail.com",
         features: [
-          "create:session",
-          "read:session",
-          "update:user",
-          "read:user",
+          Permissions.SESSION_CREATE,
+          Permissions.SESSION_READ,
+          Permissions.USER_READ,
+          Permissions.USER_UPDATE,
         ],
         password: responseBody.password,
         created_at: responseBody.created_at,
@@ -256,10 +288,10 @@ describe("PATCH  /api/v1/users/[username]", () => {
         username: userPasswordValid.username,
         email: userPasswordValid.email,
         features: [
-          "create:session",
-          "read:session",
-          "update:user",
-          "read:user",
+          Permissions.SESSION_CREATE,
+          Permissions.SESSION_READ,
+          Permissions.USER_READ,
+          Permissions.USER_UPDATE,
         ],
         password: responseBody.password,
         created_at: responseBody.created_at,
