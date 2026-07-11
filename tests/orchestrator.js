@@ -63,6 +63,11 @@ async function activateUser(userId) {
   return await user.setFeatures(userId, features);
 }
 
+async function addAFeatureToUser(userContext, feature) {
+  const features = [...userContext.features, feature];
+  await user.setFeatures(userContext.id, features);
+}
+
 const orchestrator = {
   cleanDatabase,
   execPendingMigrations,
@@ -71,6 +76,7 @@ const orchestrator = {
   deleteAllEmail,
   getLastEmail,
   activateUser,
+  addAFeatureToUser,
 };
 
 export default orchestrator;

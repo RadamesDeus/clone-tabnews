@@ -314,4 +314,51 @@ describe("PATCH  /api/v1/users/[username]", () => {
       expect(isnotPasswordHashed).toBe(false);
     });
   });
+
+  describe("Privileged user", () => {
+    test("With no update username the another user", async () => {
+      const createdUser1 = await orchestrator.createUser({});
+      const createdUser2 = await orchestrator.createUser({});
+
+      const activatedUser2 = await orchestrator.activateUser(createdUser2.id);
+      const sessionObj = await orchestrator.createSession(activatedUser2.id);
+      console.log("activatedUser2", activatedUser2);
+
+      await orchestrator.addAFeatureToUser(
+        activatedUser2,
+        Permissions.USER_UPDATE_OTHER,
+      );
+
+      const responseUp_username = await fetch(
+        `http://localhost:3000/api/v1/users/${createdUser1.username}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObj.token}`,
+          },
+          body: JSON.stringify({
+            username: `umUsuarioAlterado`,
+          }),
+        },
+      );
+
+      expect(responseUp_username.status).toBe(200);
+
+      const responseUp_usernameBody = await responseUp_username.json();
+      expect(responseUp_usernameBody).toEqual({
+        id: createdUser1.id,
+        username: "umUsuarioAlterado",
+        email: createdUser1.email,
+        features: createdUser1.features,
+        password: createdUser1.password,
+        created_at: createdUser1.created_at.toISOString(),
+        updated_at: responseUp_usernameBody.updated_at,
+      });
+      expect(
+        responseUp_usernameBody.updated_at >
+          createdUser1.updated_at.toISOString(),
+      ).toBe(true);
+    });
+  });
 });

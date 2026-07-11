@@ -1,6 +1,7 @@
 const user_role = {
   USER_CREATE: "user:create",
   USER_UPDATE: "user:update",
+  USER_UPDATE_OTHER: "user:update:other",
   USER_DELETE: "user:delete",
   USER_READ: "user:read",
 };
