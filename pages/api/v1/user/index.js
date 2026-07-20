@@ -4,6 +4,7 @@ import controller, { onNoMatch, onError } from "infra/controller";
 import session from "models/session.js";
 import user from "models/user.js";
 import { Permissions } from "infra/rule.js";
+import authorization from "models/authorization.js";
 
 const router = createRouter();
 
@@ -31,5 +32,12 @@ async function getHandlerUser(request, response) {
     "no-store, no-cache, must-revalidate, proxy-revalidate",
   );
 
-  return response.status(200).json(userFound);
+  const userContext = request.context?.user;
+  const output = await authorization.filterOutput(
+    userContext,
+    Permissions.USER_READ_SELF,
+    userFound,
+  );
+
+  return response.status(200).json(output);
 }

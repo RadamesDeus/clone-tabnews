@@ -33,9 +33,7 @@ describe("USE case:  Registration Flow.test (all successful)", () => {
     expect(userRegistrationFlow).toEqual({
       id: userRegistrationFlow.id,
       username: "RegistrationFlow",
-      email: "registration.flow@gmail.com",
       features: [Permissions.ACTIVATION_TOKEN],
-      password: userRegistrationFlow.password,
       created_at: userRegistrationFlow.created_at,
       updated_at: userRegistrationFlow.updated_at,
     });
@@ -77,6 +75,7 @@ describe("USE case:  Registration Flow.test (all successful)", () => {
 
     expect(userActive.features).not.toContain(Permissions.ACTIVATION_TOKEN);
     expect(userActive.features).toContain(Permissions.SESSION_CREATE);
+    expect(userActive.features).toContain(Permissions.SESSION_READ);
 
     const response2 = await fetch(
       `http://localhost:3000/api/v1/activations/${activationTokenMatch.id}`,

@@ -31,10 +31,10 @@ describe("GET  /api/v1/users/[username]", () => {
       expect(response1.status).toBe(200);
 
       const responseBody = await response1.json();
+
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "MesmoCase",
-        email: "MesmoCase@gmail.com",
         features: [
           Permissions.SESSION_CREATE,
           Permissions.SESSION_READ,
@@ -73,14 +73,12 @@ describe("GET  /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "caseMismatch",
-        email: "caseMismatch@gmail.com",
         features: [
           Permissions.SESSION_CREATE,
           Permissions.SESSION_READ,
           Permissions.USER_READ,
           Permissions.USER_UPDATE,
         ],
-        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });

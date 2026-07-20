@@ -48,7 +48,6 @@ describe("PATCH:  /api/v1/activations/:token", () => {
     const expiredToken = await activation.create(userValid.id);
 
     jest.useRealTimers();
-    console.log("expiredToken", expiredToken);
 
     const response = await fetch(
       `http://localhost:3000/api/v1/activations/${expiredToken.id}`,

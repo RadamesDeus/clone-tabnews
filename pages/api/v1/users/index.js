@@ -3,6 +3,7 @@ import controller, { onNoMatch, onError } from "infra/controller";
 import user from "models/user.js";
 import activation from "models/activation.js";
 import { Permissions } from "infra/rule.js";
+import authorization from "models/authorization.js";
 
 const router = createRouter();
 router.use(controller.injectAnonymousOrUser);
@@ -21,5 +22,12 @@ async function postHandlerUsers(request, response) {
   const token = await activation.create(newUser.id);
   await activation.sendEmailToUser(newUser, token.id);
 
-  return response.status(201).json(newUser);
+  const userContext = request.context?.user;
+
+  const output = await authorization.filterOutput(
+    userContext,
+    Permissions.USER_READ,
+    newUser,
+  );
+  return response.status(201).json(output);
 }

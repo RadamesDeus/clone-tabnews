@@ -4,6 +4,8 @@ const user_role = {
   USER_UPDATE_OTHER: "user:update:other",
   USER_DELETE: "user:delete",
   USER_READ: "user:read",
+  USER_READ_SELF: "user:read:self",
+  USER_READ_OTHER: "user:read:other",
 };
 
 const session_role = {
@@ -11,15 +13,31 @@ const session_role = {
   SESSION_READ: "session:read",
 };
 
+const status_role = {
+  STATUS_READ_FULL: "status:read:full",
+  STATUS_READ: "status:read",
+};
+
+const migration_role = {
+  MIGRATION_RUN: "migration:run",
+  MIGRATION_READ: "migration:read",
+};
+
 const activation_role = {
   ACTIVATION_TOKEN: "activation:token",
 };
 
+const admin_role = {
+  ADMIN: "admin",
+};
+
 export const Permissions = {
+  ...admin_role,
   ...user_role,
   ...session_role,
+  ...migration_role,
   ...activation_role,
-  ADMIN: "admin",
+  ...status_role,
 };
 
 export const Roles = {

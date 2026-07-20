@@ -30,9 +30,7 @@ describe("POST  /api/v1/users", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "testuser",
-        email: "rainbow@gmail.com",
         features: [Permissions.ACTIVATION_TOKEN],
-        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });

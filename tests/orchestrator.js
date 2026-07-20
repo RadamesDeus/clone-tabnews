@@ -1,14 +1,37 @@
+import fs from "fs/promises";
+import path from "path";
+import { faker } from "@faker-js/faker";
+
 import database from "infra/database.js";
 import migrator from "models/migrator.js";
 import user from "models/user.js";
 import session from "models/session.js";
-import { faker } from "@faker-js/faker";
 import { Permissions } from "infra/rule.js";
 
 const URLHTTPEMAIL = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`;
 
 async function cleanDatabase() {
   await database.query("drop schema public cascade; create schema public");
+}
+
+async function createFakeMigration() {
+  const migrationsDir = path.join(__dirname, "../infra/migrations");
+  const migrationName = `${Date.now()}_fake_pending_migration.js`;
+  const migrationPath = path.join(migrationsDir, migrationName);
+
+  await fs.writeFile(
+    migrationPath,
+    `
+    exports.up = async () => {};
+
+    exports.down = async () => {};
+`,
+  );
+  return migrationPath;
+}
+
+async function removeFakeMigration(migrationPath) {
+  await fs.unlink(migrationPath);
 }
 async function execPendingMigrations() {
   await migrator.execHandlerMigrations();
@@ -65,7 +88,7 @@ async function activateUser(userId) {
 
 async function addAFeatureToUser(userContext, feature) {
   const features = [...userContext.features, feature];
-  await user.setFeatures(userContext.id, features);
+  return await user.setFeatures(userContext.id, features);
 }
 
 const orchestrator = {
@@ -77,6 +100,8 @@ const orchestrator = {
   getLastEmail,
   activateUser,
   addAFeatureToUser,
+  createFakeMigration,
+  removeFakeMigration,
 };
 
 export default orchestrator;

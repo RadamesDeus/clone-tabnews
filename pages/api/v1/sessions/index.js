@@ -24,13 +24,13 @@ export default router.handler({
 async function postHandlerSessions(request, response) {
   const userData = request.body; //JSON.parse(request.body);
 
-  const user = await authentication.getAuthenticationUser(
+  const userAuthenticated = await authentication.getAuthenticationUser(
     userData.email,
     userData.password,
   );
 
   const authorizated = await authorization.can(
-    user,
+    userAuthenticated,
     Permissions.SESSION_CREATE,
   );
 
@@ -40,11 +40,16 @@ async function postHandlerSessions(request, response) {
       action: `Verifique se o seu usuário possui a feature`,
     });
 
-  const newSession = await session.create(user.id);
-
+  const newSession = await session.create(userAuthenticated.id);
   controller.setSessionCookie(response, newSession.token);
 
-  response.status(201).json(newSession);
+  const output = await authorization.filterOutput(
+    userAuthenticated,
+    Permissions.SESSION_READ,
+    newSession,
+  );
+
+  response.status(201).json(output);
 }
 
 async function deleteHandlerSessions(request, response) {
@@ -53,5 +58,12 @@ async function deleteHandlerSessions(request, response) {
   );
   const sessionValidUpdated = await session.expireById(sessionValid.id);
   controller.cleanSessionCookie(response);
-  return response.status(200).json(sessionValidUpdated);
+
+  const userContext = request.context?.user;
+  const output = await authorization.filterOutput(
+    userContext,
+    Permissions.SESSION_READ,
+    sessionValidUpdated,
+  );
+  return response.status(200).json(output);
 }

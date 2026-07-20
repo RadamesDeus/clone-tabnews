@@ -198,14 +198,12 @@ describe("PATCH  /api/v1/users/[username]", () => {
       expect(responseUp_usernameBody).toEqual({
         id: responseUp_usernameBody.id,
         username: "usernameValid3",
-        email: responseUp_usernameBody.email,
         features: [
           Permissions.SESSION_CREATE,
           Permissions.SESSION_READ,
           Permissions.USER_READ,
           Permissions.USER_UPDATE,
         ],
-        password: responseUp_usernameBody.password,
         created_at: responseUp_usernameBody.created_at,
         updated_at: responseUp_usernameBody.updated_at,
       });
@@ -242,14 +240,12 @@ describe("PATCH  /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: responseBody.username,
-        email: "User4Valid@gmail.com",
         features: [
           Permissions.SESSION_CREATE,
           Permissions.SESSION_READ,
           Permissions.USER_READ,
           Permissions.USER_UPDATE,
         ],
-        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -286,14 +282,12 @@ describe("PATCH  /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: userPasswordValid.username,
-        email: userPasswordValid.email,
         features: [
           Permissions.SESSION_CREATE,
           Permissions.SESSION_READ,
           Permissions.USER_READ,
           Permissions.USER_UPDATE,
         ],
-        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -322,7 +316,6 @@ describe("PATCH  /api/v1/users/[username]", () => {
 
       const activatedUser2 = await orchestrator.activateUser(createdUser2.id);
       const sessionObj = await orchestrator.createSession(activatedUser2.id);
-      console.log("activatedUser2", activatedUser2);
 
       await orchestrator.addAFeatureToUser(
         activatedUser2,
@@ -349,9 +342,7 @@ describe("PATCH  /api/v1/users/[username]", () => {
       expect(responseUp_usernameBody).toEqual({
         id: createdUser1.id,
         username: "umUsuarioAlterado",
-        email: createdUser1.email,
         features: createdUser1.features,
-        password: createdUser1.password,
         created_at: createdUser1.created_at.toISOString(),
         updated_at: responseUp_usernameBody.updated_at,
       });
