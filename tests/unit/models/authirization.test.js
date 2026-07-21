@@ -62,7 +62,7 @@ describe("models/authorization.js", () => {
       }).rejects.toThrow(InternalServerError);
     });
 
-    test("with user and feature know and without resourceTarget", async () => {
+    test("with user and feature know and but no resourceTarget", async () => {
       await expect(async () => {
         await authorization.filterOutput({}, "user:read");
       }).rejects.toThrow(InternalServerError);
