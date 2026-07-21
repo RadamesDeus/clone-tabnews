@@ -1,7 +1,16 @@
 import { Permissions } from "infra/rule.js";
+import { InternalServerError } from "infra/errors.js";
 
 async function can(userContext, requestFeature, resourceTarget) {
   let authorized = false;
+
+  if (!userContext || !requestFeature)
+    throw new InternalServerError({ cause: "Sem user de contexto" });
+
+  if (!Object.values(Permissions).includes(requestFeature))
+    throw new InternalServerError({
+      cause: `não existe essa feature ${requestFeature}`,
+    });
 
   if (userContext.features.includes(Permissions.ADMIN)) return true;
 
@@ -21,7 +30,18 @@ async function can(userContext, requestFeature, resourceTarget) {
 }
 
 const filterOutput = async (userContext, requestFeature, resourceTarget) => {
-  if (!resourceTarget) return null;
+  if (!userContext || !requestFeature)
+    throw new InternalServerError({ cause: "Sem user de contexto" });
+
+  if (!Object.values(Permissions).includes(requestFeature))
+    throw new InternalServerError({
+      cause: `não existe essa feature ${requestFeature}`,
+    });
+
+  if (!resourceTarget)
+    throw new InternalServerError({
+      cause: `não existe essa resourceTarget ${resourceTarget}`,
+    });
 
   if (requestFeature === Permissions.USER_READ) {
     return {
