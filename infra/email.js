@@ -1,7 +1,17 @@
 import nodemailer from "nodemailer";
+import { ServiceError } from "./errors.js";
 
 async function sendEmail(mailOptions) {
-  return await transporter.sendMail(mailOptions);
+  try {
+    return await transporter.sendMail(mailOptions);
+  } catch (error) {
+    throw new ServiceError({
+      message: "Não foi possível envar o email.",
+      action: "Verifique se o serviço de email está disponível",
+      cause: error,
+      context: mailOptions,
+    });
+  }
 }
 
 const transporter = nodemailer.createTransport({
