@@ -1,8 +1,18 @@
 import userSWR from "swr";
 async function fetchAPI(key) {
-  const response = await fetch(key);
-  const bodyResponse = await response.json();
-  return bodyResponse;
+  try {
+    const response = await fetch(key);
+    const bodyResponse = await response.json();
+    return bodyResponse;
+  } catch (error) {
+    console.log("error:", error);
+  }
+  return {
+    update_at: new Date(),
+    dependencies: {
+      database: { version: 0, max_connections: "", opened_connections: "" },
+    },
+  };
 }
 
 function Status({ tipo }) {
