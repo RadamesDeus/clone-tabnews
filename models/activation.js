@@ -22,7 +22,7 @@ async function create(userId) {
 
 async function sendEmailToUser(userSend, token) {
   await email.sendEmail({
-    from: "Clone Tabnews <contato@clonetabnews.com.br>",
+    from: "Clone Tabnews <contato@radames.dev.br>",
     to: `${userSend.userSendname} <${userSend.email}>`,
     subject: "Ative seu cadastro no Clone Tabnews",
     text: `Olá, ${userSend.username}! Para ativar sua conta, clique no link abaixo:
