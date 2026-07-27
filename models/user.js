@@ -1,25 +1,28 @@
 import database from "infra/database.js";
 import password from "models/password.js";
 import { ValidationError, NotFoundError } from "infra/errors.js";
+import { Permissions } from "infra/rule.js";
 
 async function create(userInputValues) {
   await getEmailDuplicate(userInputValues.email);
   await getUsernameDuplicate(userInputValues.username);
   await hashPasswordInObject(userInputValues);
+  await inputDeafaultFeaturesInObhect(userInputValues);
 
   const newUser = await runInsertQuery(userInputValues);
   return newUser;
 
   async function runInsertQuery(userInputValues) {
     const result = await database.query({
-      text: `INSERT INTO users (username, email, password)
-            VALUES ($1,$2,$3)
+      text: `INSERT INTO users (username, email, password, features)
+            VALUES ($1,$2,$3,$4)
               returning *
               ;`,
       values: [
         userInputValues.username.trim(),
         userInputValues.email.trim(),
         userInputValues.password.trim(),
+        userInputValues.features,
       ],
     });
 
@@ -37,7 +40,7 @@ async function getEmailDuplicate(email) {
     throw new ValidationError({
       cause: "Email já cadastrado.",
       action: "Utilize outro email para essa operação.",
-      message: "Erro ao execultar essa operação.",
+      message: "Erro ao executar essa operação.",
       status_code: 400,
     });
   }
@@ -104,15 +107,9 @@ async function findByEmail(email) {
   return result.rows[0];
 }
 
-// async function login(email, passwordInput) {
-//   const user = await findByEmail(email);
-//   const isMatch = await password.verify(passwordInput, user.password);
-//   if (!isMatch) {
-//     throw new UnauthorizedError({});
-//   }
-
-//   return user;
-// }
+async function inputDeafaultFeaturesInObhect(userInputValues) {
+  userInputValues.features = [Permissions.ACTIVATION_TOKEN];
+}
 
 async function update(username, userInputValue) {
   const currentUser = await findByUsername(username);
@@ -175,12 +172,28 @@ async function findOneById(id) {
   return result.rows[0];
 }
 
+async function setFeatures(userId, features) {
+  const result = await database.query({
+    text: `UPDATE  
+            users
+          SET           
+            features = $2,
+            updated_at = timezone('utc'::text, now())
+          WHERE id = $1
+          RETURNING *;`,
+    values: [userId, features],
+  });
+
+  return result.rows[0];
+}
+
 const user = {
   create,
   findByUsername,
   update,
   findByEmail,
   findOneById,
+  setFeatures,
 };
 
 export default user;

@@ -1,5 +1,5 @@
 import orchestrator from "tests/orchestrator.js";
-// import database from "infra/database.js";
+import { Permissions } from "infra/rule.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -9,11 +9,14 @@ beforeAll(async () => {
 describe("GET  /api/v1/users/[username]", () => {
   describe("Anonynous user", () => {
     test("With exact case match `username`", async () => {
-      await orchestrator.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "MesmoCase",
         email: "MesmoCase@gmail.com",
         password: "123475",
       });
+
+      await orchestrator.activateUser(createdUser.id);
+      const sessionObj = await orchestrator.createSession(createdUser.id);
 
       const response1 = await fetch(
         "http://localhost:3000/api/v1/users/MesmoCase",
@@ -21,16 +24,23 @@ describe("GET  /api/v1/users/[username]", () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObj.token}`,
           },
         },
       );
       expect(response1.status).toBe(200);
 
       const responseBody = await response1.json();
+
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "MesmoCase",
-        email: "MesmoCase@gmail.com",
+        features: [
+          Permissions.SESSION_CREATE,
+          Permissions.SESSION_READ,
+          Permissions.USER_READ,
+          Permissions.USER_UPDATE,
+        ],
         password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -38,11 +48,14 @@ describe("GET  /api/v1/users/[username]", () => {
     });
 
     test("With case mismatch `username`", async () => {
-      await orchestrator.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "caseMismatch",
         email: "caseMismatch@gmail.com",
         password: "123475",
       });
+
+      await orchestrator.activateUser(createdUser.id);
+      const sessionObj = await orchestrator.createSession(createdUser.id);
 
       const response1 = await fetch(
         "http://localhost:3000/api/v1/users/casemismatch",
@@ -50,6 +63,7 @@ describe("GET  /api/v1/users/[username]", () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObj.token}`,
           },
         },
       );
@@ -59,8 +73,12 @@ describe("GET  /api/v1/users/[username]", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         username: "caseMismatch",
-        email: "caseMismatch@gmail.com",
-        password: responseBody.password,
+        features: [
+          Permissions.SESSION_CREATE,
+          Permissions.SESSION_READ,
+          Permissions.USER_READ,
+          Permissions.USER_UPDATE,
+        ],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -76,7 +94,7 @@ describe("GET  /api/v1/users/[username]", () => {
           },
         },
       );
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(403);
     });
   });
 });

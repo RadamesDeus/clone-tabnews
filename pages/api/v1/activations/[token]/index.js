@@ -1,33 +1,34 @@
 import { createRouter } from "next-connect";
 import controller, { onNoMatch, onError } from "infra/controller";
-import user from "models/user.js";
 import activation from "models/activation.js";
 import { Permissions } from "infra/rule.js";
 import authorization from "models/authorization.js";
 
 const router = createRouter();
 router.use(controller.injectAnonymousOrUser);
-router.post(controller.canRequest(Permissions.USER_CREATE), postHandlerUsers);
+router.patch(
+  controller.canRequest(Permissions.ACTIVATION_TOKEN),
+  patchHandlerToken,
+);
 
 export default router.handler({
   onNoMatch,
   onError,
 });
 
-async function postHandlerUsers(request, response) {
-  const userData = request.body; //JSON.parse(request.body);
+async function patchHandlerToken(request, response) {
+  const token = request.query?.token;
 
-  const newUser = await user.create(userData);
-
-  const token = await activation.create(newUser.id);
-  await activation.sendEmailToUser(newUser, token.id);
-
+  const activationTokenMatch = await activation.findActivationByToken(token);
+  await activation.activateUserbyUserId(activationTokenMatch.user_id);
+  const activationTokenUsed = await activation.markTokenAsUsed(token);
   const userContext = request.context?.user;
 
   const output = await authorization.filterOutput(
     userContext,
-    Permissions.USER_READ,
-    newUser,
+    Permissions.ACTIVATION_TOKEN,
+    activationTokenUsed,
   );
-  return response.status(201).json(output);
+
+  return response.status(200).json(output);
 }

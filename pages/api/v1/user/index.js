@@ -1,12 +1,15 @@
 import { createRouter } from "next-connect";
 
-import { onNoMatch, onError, setSessionCookie } from "infra/controller";
+import controller, { onNoMatch, onError } from "infra/controller";
 import session from "models/session.js";
 import user from "models/user.js";
+import { Permissions } from "infra/rule.js";
+import authorization from "models/authorization.js";
 
 const router = createRouter();
 
-router.get(getHandlerUser);
+router.use(controller.injectAnonymousOrUser);
+router.get(controller.canRequest(Permissions.SESSION_READ), getHandlerUser);
 
 export default router.handler({
   onNoMatch,
@@ -22,12 +25,19 @@ async function getHandlerUser(request, response) {
 
   const userFound = await user.findOneById(sessionUpdated.user_id);
 
-  setSessionCookie(response, sessionUpdated.token);
+  controller.setSessionCookie(response, sessionUpdated.token);
 
   response.setHeader(
     "Cache-Control",
     "no-store, no-cache, must-revalidate, proxy-revalidate",
   );
 
-  return response.status(200).json(userFound);
+  const userContext = request.context?.user;
+  const output = await authorization.filterOutput(
+    userContext,
+    Permissions.USER_READ_SELF,
+    userFound,
+  );
+
+  return response.status(200).json(output);
 }

@@ -2,6 +2,7 @@ import orchestrator from "tests/orchestrator.js";
 import session from "models/session";
 import { version as uuidVersion } from "uuid";
 import setCookiePparser from "set-cookie-parser";
+import { Permissions } from "infra/rule.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -9,12 +10,28 @@ beforeAll(async () => {
 });
 
 describe("GET  /api/v1/user", () => {
+  describe("Anonymous user", () => {
+    test("Retrievin the endpoint", async () => {
+      const response = await fetch("http://localhost:3000/api/v1/user");
+      expect(response.status).toBe(403);
+
+      const responseBody = await response.json();
+
+      expect(responseBody).toEqual({
+        name: "ForbiddenError",
+        message: "O usuário não possui permissão para executar esta ação.",
+        action: `Verifique se o seu usuário possui a feature [${Permissions.SESSION_READ}]`,
+        status_code: 403,
+      });
+    });
+  });
+
   describe("Default user", () => {
     test("With valid session", async () => {
       const createUser = await orchestrator.createUser({
         username: "UserWithValidSession",
       });
-
+      const ActivatedUser = await orchestrator.activateUser(createUser.id);
       const sessionObj = await orchestrator.createSession(createUser.id);
 
       const response = await fetch("http://localhost:3000/api/v1/user", {
@@ -31,9 +48,15 @@ describe("GET  /api/v1/user", () => {
         id: createUser.id,
         username: "UserWithValidSession",
         email: createUser.email,
-        password: createUser.password,
+        features: [
+          Permissions.SESSION_CREATE,
+          Permissions.SESSION_READ,
+          Permissions.USER_READ,
+          Permissions.USER_UPDATE,
+        ],
+
         created_at: createUser.created_at.toISOString(),
-        updated_at: createUser.updated_at.toISOString(),
+        updated_at: ActivatedUser.updated_at.toISOString(),
       });
 
       expect(uuidVersion(responseBody.id)).toBe(4);
@@ -121,9 +144,11 @@ describe("GET  /api/v1/user", () => {
     });
 
     test("With session about to expire", async () => {
-      const createUser = await orchestrator.createUser({
+      const createdUser = await orchestrator.createUser({
         username: "UserWithAboutToExpireSession",
       });
+
+      const createUser = await orchestrator.activateUser(createdUser.id);
 
       jest.useFakeTimers({
         now: new Date(
@@ -147,7 +172,13 @@ describe("GET  /api/v1/user", () => {
         id: createUser.id,
         username: "UserWithAboutToExpireSession",
         email: createUser.email,
-        password: createUser.password,
+        features: [
+          Permissions.SESSION_CREATE,
+          Permissions.SESSION_READ,
+          Permissions.USER_READ,
+          Permissions.USER_UPDATE,
+        ],
+
         created_at: createUser.created_at.toISOString(),
         updated_at: createUser.updated_at.toISOString(),
       });

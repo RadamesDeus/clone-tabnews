@@ -21,8 +21,28 @@ export class ValidationError extends Error {
     super("Ocorreu um erro de validação.", { cause });
     this.name = "ValidationError";
     this.action = action || "entre em contato com suport.";
-    this.message = message || "Erro ao execultar essa operação.";
+    this.message = message || "Erro ao executar essa operação.";
     this.status_code = status_code || 400;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status_code: this.status_code,
+    };
+  }
+}
+
+export class ForbiddenError extends Error {
+  constructor({ action, cause, status_code, message }) {
+    super("Usuário não autorizado.", { cause });
+    this.name = "ForbiddenError";
+    this.action =
+      action || "verifique se o usuario tem a feature para o acesso";
+    this.message = message || `Usuário não autorizado.`;
+    this.status_code = status_code || 403;
   }
 
   toJSON() {
@@ -92,11 +112,13 @@ export class MethodNotAllowedError extends Error {
 }
 
 export class ServiceError extends Error {
-  constructor({ cause, message }) {
+  constructor({ cause, message, action, context }) {
     super(message || "Serviço indiponível no momento.", { cause });
     this.name = "ServiceError";
-    this.action = "Verifique se o serviço está funcionando corretamente.";
+    this.action =
+      action || "Verifique se o serviço está funcionando corretamente.";
     this.status_code = 503;
+    this.context = context;
   }
 
   toJSON() {
@@ -105,6 +127,7 @@ export class ServiceError extends Error {
       message: this.message,
       action: this.action,
       status_code: this.status_code,
+      context: this.context,
     };
   }
 }

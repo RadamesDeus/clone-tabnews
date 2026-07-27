@@ -1,13 +1,16 @@
 import * as cookie from "cookie";
-
+import { Permissions } from "infra/rule.js";
 import {
   InternalServerError,
   MethodNotAllowedError,
   ValidationError,
   NotFoundError,
   UnauthorizedError,
+  ForbiddenError,
 } from "infra/errors.js";
 import session from "models/session.js";
+import user from "models/user.js";
+import authorization from "models/authorization.js";
 
 export function onNoMatch(req, res) {
   const publicErroObject = new MethodNotAllowedError();
@@ -15,7 +18,11 @@ export function onNoMatch(req, res) {
   res.status(publicErroObject.status_code).json(publicErroObject);
 }
 export function onError(err, req, res) {
-  if (err instanceof ValidationError || err instanceof NotFoundError) {
+  if (
+    err instanceof ValidationError ||
+    err instanceof NotFoundError ||
+    err instanceof ForbiddenError
+  ) {
     return res.status(err.status_code).json(err);
   }
 
@@ -52,3 +59,55 @@ export function cleanSessionCookie(response) {
 
   response.setHeader("Set-Cookie", setCookes);
 }
+
+export async function injectAnonymousOrUser(request, response, next) {
+  if (request.cookies?.session_id) await injectUserAutheticated(request);
+  else await injectUserAnonymous(request);
+  return next();
+}
+
+async function injectUserAutheticated(request) {
+  const sessionToken = request.cookies.session_id;
+
+  const sessionValid = await session.findOneValidByToken(sessionToken);
+  const userObject = await user.findOneById(sessionValid.user_id);
+  request.context = {
+    ...request.context,
+    user: userObject,
+  };
+}
+
+async function injectUserAnonymous(request) {
+  request.context = {
+    ...request.context,
+    user: {
+      features: [
+        Permissions.ACTIVATION_TOKEN,
+        Permissions.SESSION_CREATE,
+        Permissions.USER_CREATE,
+      ],
+    },
+  };
+}
+
+export function canRequest(feature) {
+  return async function canRequestMiddlewere(request, response, next) {
+    const canRequest = await authorization.can(request.context.user, feature);
+
+    if (canRequest) return next();
+
+    throw new ForbiddenError({
+      message: `O usuário não possui permissão para executar esta ação.`,
+      action: `Verifique se o seu usuário possui a feature [${feature}]`,
+    });
+  };
+}
+
+const controller = {
+  setSessionCookie,
+  cleanSessionCookie,
+  injectAnonymousOrUser,
+  canRequest,
+};
+
+export default controller;

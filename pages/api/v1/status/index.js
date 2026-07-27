@@ -1,11 +1,14 @@
 import { createRouter } from "next-connect";
 
 import database from "infra/database.js";
-import { onNoMatch, onError } from "infra/controller";
+import controller, { onNoMatch, onError } from "infra/controller.js";
+import { Permissions } from "infra/rule.js";
+import authorization from "models/authorization.js";
 
 const router = createRouter();
 
-router.get(status);
+router.use(controller.injectAnonymousOrUser);
+router.get(controller.canRequest(Permissions.STATUS_READ), status);
 
 export default router.handler({
   onNoMatch,
@@ -23,14 +26,19 @@ async function status(request, response) {
     values: [databaseStr],
   });
 
-  response.status(200).json({
+  const statusObj = {
     update_at: updateAt,
     dependencies: {
       database: {
-        version: versionpg.rows[0].server_version,
         max_connections: parseInt(max_connections.rows[0].max_connections),
         opened_connections: parseInt(stat_activity.rows[0].count),
       },
     },
-  });
+  };
+  const userContext = request.context?.user;
+
+  if (await authorization.can(userContext, Permissions.STATUS_READ_FULL))
+    statusObj.dependencies.database.version = versionpg.rows[0].server_version;
+
+  response.status(200).json(statusObj);
 }
