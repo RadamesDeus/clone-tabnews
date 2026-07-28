@@ -4,17 +4,10 @@ import activation from "models/activation.js";
 import { Permissions } from "infra/rule.js";
 import authorization from "models/authorization.js";
 
-const router = createRouter();
-router.use(controller.injectAnonymousOrUser);
-router.patch(
-  controller.canRequest(Permissions.ACTIVATION_TOKEN),
-  patchHandlerToken,
-);
-
-export default router.handler({
-  onNoMatch,
-  onError,
-});
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .patch(controller.canRequest(Permissions.ACTIVATION_TOKEN), patchHandlerToken)
+  .handler({ onNoMatch, onError });
 
 async function patchHandlerToken(request, response) {
   const token = request.query?.token;

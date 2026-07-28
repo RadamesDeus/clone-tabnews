@@ -5,15 +5,10 @@ import controller, { onNoMatch, onError } from "infra/controller.js";
 import { Permissions } from "infra/rule.js";
 import authorization from "models/authorization.js";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.get(controller.canRequest(Permissions.STATUS_READ), status);
-
-export default router.handler({
-  onNoMatch,
-  onError,
-});
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .get(controller.canRequest(Permissions.STATUS_READ), status)
+  .handler({ onNoMatch, onError });
 
 async function status(request, response) {
   const updateAt = new Date().toISOString();

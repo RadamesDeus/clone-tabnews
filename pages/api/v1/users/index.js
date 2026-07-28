@@ -5,14 +5,10 @@ import activation from "models/activation.js";
 import { Permissions } from "infra/rule.js";
 import authorization from "models/authorization.js";
 
-const router = createRouter();
-router.use(controller.injectAnonymousOrUser);
-router.post(controller.canRequest(Permissions.USER_CREATE), postHandlerUsers);
-
-export default router.handler({
-  onNoMatch,
-  onError,
-});
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .post(controller.canRequest(Permissions.USER_CREATE), postHandlerUsers)
+  .handler({ onNoMatch, onError });
 
 async function postHandlerUsers(request, response) {
   const userData = request.body; //JSON.parse(request.body);
