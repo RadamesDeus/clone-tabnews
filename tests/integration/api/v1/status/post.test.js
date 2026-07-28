@@ -3,8 +3,6 @@ import webserver from "infra/webserver.js";
 describe("POST  /api/v1/status", () => {
   describe("Anonynous user", () => {
     test("Retrieeving current system status", async () => {
-      console.log(`${webserver.getOrigin()}/api/v1/status`);
-
       const response = await fetch(`${webserver.getOrigin()}/api/v1/status`, {
         method: "POST",
       });

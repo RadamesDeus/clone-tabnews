@@ -136,7 +136,7 @@ describe("POST  /api/v1/sessions", () => {
         session.EXPIRESATINDAYS_IN_MILLSECOND,
       );
 
-      const cookies = await setCookiePparser(response, { map: true });
+      const cookies = setCookiePparser(response, { map: true });
 
       expect(cookies.session_id).toEqual({
         name: "session_id",
