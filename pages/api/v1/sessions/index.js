@@ -24,7 +24,7 @@ export default router.handler({
 async function postHandlerSessions(request, response) {
   const userData = request.body; //JSON.parse(request.body);
 
-  const userAuthenticated = await authentication.getAuthenticationUser(
+  const userAuthenticated = await authentication.getUser(
     userData.email,
     userData.password,
   );

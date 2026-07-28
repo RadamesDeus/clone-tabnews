@@ -4,6 +4,7 @@ import activation from "models/activation";
 import orchestrator from "tests/orchestrator.js";
 import user from "models/user";
 import { Permissions } from "infra/rule.js";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -14,7 +15,7 @@ beforeAll(async () => {
 describe("PATCH:  /api/v1/activations/:token", () => {
   test("Default anonymous user", async () => {
     const response = await fetch(
-      `http://localhost:3000/api/v1/activations/550e8400-e29b-41d4-a716-446655440000`,
+      `${webserver.getOrigin()}/api/v1/activations/550e8400-e29b-41d4-a716-446655440000`,
       {
         method: "PATCH",
         headers: {
@@ -27,7 +28,7 @@ describe("PATCH:  /api/v1/activations/:token", () => {
 
   test("With invalid token format", async () => {
     const response = await fetch(
-      `http://localhost:3000/api/v1/activations/invalidToken`,
+      `${webserver.getOrigin()}/api/v1/activations/invalidToken`,
       {
         method: "PATCH",
         headers: {
@@ -50,7 +51,7 @@ describe("PATCH:  /api/v1/activations/:token", () => {
     jest.useRealTimers();
 
     const response = await fetch(
-      `http://localhost:3000/api/v1/activations/${expiredToken.id}`,
+      `${webserver.getOrigin()}/api/v1/activations/${expiredToken.id}`,
       {
         method: "PATCH",
         headers: {
@@ -67,7 +68,7 @@ describe("PATCH:  /api/v1/activations/:token", () => {
     await activation.markTokenAsUsed(usedToken.id);
 
     const response = await fetch(
-      `http://localhost:3000/api/v1/activations/${usedToken.id}`,
+      `${webserver.getOrigin()}/api/v1/activations/${usedToken.id}`,
       {
         method: "PATCH",
         headers: {
@@ -83,7 +84,7 @@ describe("PATCH:  /api/v1/activations/:token", () => {
     const usedToken = await activation.create(userValid.id);
 
     const response = await fetch(
-      `http://localhost:3000/api/v1/activations/${usedToken.id}`,
+      `${webserver.getOrigin()}/api/v1/activations/${usedToken.id}`,
       {
         method: "PATCH",
         headers: {
@@ -137,7 +138,7 @@ describe("PATCH:  /api/v1/activations/:token", () => {
     const usedToken = await activation.create(userActivated.id);
 
     const response = await fetch(
-      `http://localhost:3000/api/v1/activations/${usedToken.id}`,
+      `${webserver.getOrigin()}/api/v1/activations/${usedToken.id}`,
       {
         method: "PATCH",
         headers: {

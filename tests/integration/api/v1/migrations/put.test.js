@@ -1,4 +1,5 @@
 import orchestrator from "tests/orchestrator.js";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -7,9 +8,12 @@ beforeAll(async () => {
 describe("PUT  /api/v1/migrations", () => {
   describe("Anonynous user", () => {
     test("Metodo não permitido para este endpoint.", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/migrations", {
-        method: "PUT",
-      });
+      const response = await fetch(
+        `${webserver.getOrigin()}/api/v1/migrations`,
+        {
+          method: "PUT",
+        },
+      );
       expect(response.status).toBe(405);
       const bodyResponse = await response.json();
       expect(bodyResponse).toEqual({

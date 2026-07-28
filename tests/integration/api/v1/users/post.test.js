@@ -3,6 +3,7 @@ import orchestrator from "tests/orchestrator.js";
 import user from "models/user";
 import password from "models/password";
 import { Permissions } from "infra/rule.js";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -12,7 +13,7 @@ beforeAll(async () => {
 describe("POST  /api/v1/users", () => {
   describe("Anonynous user", () => {
     test("With unique and valid data", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/users", {
+      const response = await fetch(`${webserver.getOrigin()}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,8 +53,8 @@ describe("POST  /api/v1/users", () => {
       expect(isnotPasswordHashed).toBe(false);
     });
 
-    test("With duplicate `email`", async () => {
-      const response1 = await fetch("http://localhost:3000/api/v1/users", {
+    test("With duplicate 'email'", async () => {
+      const response1 = await fetch(`${webserver.getOrigin()}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -66,7 +67,7 @@ describe("POST  /api/v1/users", () => {
       });
       expect(response1.status).toBe(201);
 
-      const response = await fetch("http://localhost:3000/api/v1/users", {
+      const response = await fetch(`${webserver.getOrigin()}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -88,8 +89,8 @@ describe("POST  /api/v1/users", () => {
       });
     });
 
-    test("With duplicate `username`", async () => {
-      const response1 = await fetch("http://localhost:3000/api/v1/users", {
+    test("With duplicate 'username'", async () => {
+      const response1 = await fetch(`${webserver.getOrigin()}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -102,7 +103,7 @@ describe("POST  /api/v1/users", () => {
       });
       expect(response1.status).toBe(201);
 
-      const response = await fetch("http://localhost:3000/api/v1/users", {
+      const response = await fetch(`${webserver.getOrigin()}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -40,5 +40,5 @@ async function status(request, response) {
   if (await authorization.can(userContext, Permissions.STATUS_READ_FULL))
     statusObj.dependencies.database.version = versionpg.rows[0].server_version;
 
-  response.status(200).json(statusObj);
+  return response.status(200).json(statusObj);
 }

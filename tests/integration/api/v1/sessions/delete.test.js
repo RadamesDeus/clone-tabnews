@@ -1,6 +1,7 @@
 import orchestrator from "tests/orchestrator.js";
 import session from "models/session.js";
 import setCookiePparser from "set-cookie-parser";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -16,7 +17,7 @@ describe("DELETE  /api/v1/sessions", () => {
 
       const sessionObj = await orchestrator.createSession(createUser.id);
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.getOrigin()}/api/v1/sessions`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -45,13 +46,16 @@ describe("DELETE  /api/v1/sessions", () => {
         maxAge: -1,
       });
 
-      const response2 = await fetch("http://localhost:3000/api/v1/sessions", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Cookie: `session_id=${sessionObj.token}`,
+      const response2 = await fetch(
+        `${webserver.getOrigin()}/api/v1/sessions`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObj.token}`,
+          },
         },
-      });
+      );
 
       expect(response2.status).toBe(401);
 
@@ -69,7 +73,7 @@ describe("DELETE  /api/v1/sessions", () => {
     test("Delete With invalid session", async () => {
       const nonexistenTokenSession =
         "1979cc8720d10f3d642ec4e3146b99f48627eb4ed254630132fdd08cf2133d3fe46f01ed903842cb2ecf5149fda48378";
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.getOrigin()}/api/v1/sessions`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -100,7 +104,7 @@ describe("DELETE  /api/v1/sessions", () => {
       const sessionObj = await orchestrator.createSession(createUser.id);
       jest.useRealTimers();
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.getOrigin()}/api/v1/sessions`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

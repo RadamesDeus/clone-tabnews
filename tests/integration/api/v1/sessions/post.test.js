@@ -3,9 +3,7 @@ import setCookiePparser from "set-cookie-parser";
 
 import orchestrator from "tests/orchestrator.js";
 import session from "models/session";
-// import { tr } from "@faker-js/faker";
-// import user from "models/user";
-// import password from "models/password";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -19,7 +17,7 @@ describe("POST  /api/v1/sessions", () => {
         password: "SenhaCorrect",
       });
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.getOrigin()}/api/v1/sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +43,7 @@ describe("POST  /api/v1/sessions", () => {
         email: "Email_Correto@gmail.com",
       });
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.getOrigin()}/api/v1/sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -69,7 +67,7 @@ describe("POST  /api/v1/sessions", () => {
     test("With `password` and `email` incorrect", async () => {
       await orchestrator.createUser({});
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.getOrigin()}/api/v1/sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -98,7 +96,7 @@ describe("POST  /api/v1/sessions", () => {
 
       const user = await orchestrator.activateUser(createdUser.id);
 
-      const response = await fetch("http://localhost:3000/api/v1/sessions", {
+      const response = await fetch(`${webserver.getOrigin()}/api/v1/sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
