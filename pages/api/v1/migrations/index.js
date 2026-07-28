@@ -4,22 +4,11 @@ import migrator from "models/migrator.js";
 import { Permissions } from "infra/rule.js";
 import authorization from "models/authorization.js";
 
-const router = createRouter();
-router.use(controller.injectAnonymousOrUser);
-
-router.get(
-  controller.canRequest(Permissions.MIGRATION_READ),
-  getHandlerMigrations,
-);
-router.post(
-  controller.canRequest(Permissions.MIGRATION_RUN),
-  postHandlerMigrations,
-);
-
-export default router.handler({
-  onNoMatch,
-  onError,
-});
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .get(controller.canRequest(Permissions.MIGRATION_READ), getHandlerMigrations)
+  .post(controller.canRequest(Permissions.MIGRATION_RUN), postHandlerMigrations)
+  .handler({ onNoMatch, onError });
 
 async function postHandlerMigrations(request, response) {
   const migratedMigrations = await migrator.execHandlerMigrations();

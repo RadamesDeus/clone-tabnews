@@ -1,5 +1,6 @@
 import orchestrator from "tests/orchestrator.js";
 import { Permissions } from "infra/rule.js";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -22,7 +23,7 @@ describe("POST  /api/v1/migrations", () => {
         const fileMigrationPath = await orchestrator.createFakeMigration();
 
         const response = await fetch(
-          "http://localhost:3000/api/v1/migrations",
+          `${webserver.getOrigin()}/api/v1/migrations`,
           {
             method: "POST",
             headers: {
@@ -51,7 +52,7 @@ describe("POST  /api/v1/migrations", () => {
         );
 
         const responseEmpty = await fetch(
-          "http://localhost:3000/api/v1/migrations",
+          `${webserver.getOrigin()}/api/v1/migrations`,
           {
             method: "POST",
             headers: {
@@ -68,9 +69,12 @@ describe("POST  /api/v1/migrations", () => {
 
   describe("Anonynous user", () => {
     test("With user anonymous can not running pending migrations", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/migrations", {
-        method: "POST",
-      });
+      const response = await fetch(
+        `${webserver.getOrigin()}/api/v1/migrations`,
+        {
+          method: "POST",
+        },
+      );
       expect(response.status).toBe(403);
     });
   });

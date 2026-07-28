@@ -1,5 +1,6 @@
 import orchestrator from "tests/orchestrator.js";
 import { Permissions } from "infra/rule.js";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -9,7 +10,7 @@ beforeAll(async () => {
 describe("GET  /api/v1/status", () => {
   describe("Anonynous user", () => {
     test("Retrieving can't Anonymous user current system status", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/status");
+      const response = await fetch(`${webserver.getOrigin()}/api/v1/status`);
       expect(response.status).toBe(403);
     });
   });
@@ -25,7 +26,7 @@ describe("GET  /api/v1/status", () => {
         Permissions.STATUS_READ,
       );
 
-      const response = await fetch("http://localhost:3000/api/v1/status", {
+      const response = await fetch(`${webserver.getOrigin()}/api/v1/status`, {
         method: "GET",
         headers: {
           Cookie: `session_id=${sessionObj.token}`,
@@ -59,7 +60,7 @@ describe("GET  /api/v1/status", () => {
         Permissions.STATUS_READ_FULL,
       );
 
-      const response = await fetch("http://localhost:3000/api/v1/status", {
+      const response = await fetch(`${webserver.getOrigin()}/api/v1/status`, {
         method: "GET",
         headers: {
           Cookie: `session_id=${sessionObj.token}`,

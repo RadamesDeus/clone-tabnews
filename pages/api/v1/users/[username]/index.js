@@ -5,15 +5,11 @@ import user from "models/user.js";
 import { Permissions } from "infra/rule.js";
 import authorization from "models/authorization.js";
 
-const router = createRouter();
-router.use(controller.injectAnonymousOrUser);
-router.get(controller.canRequest(Permissions.USER_READ), getHandlerUsers);
-router.patch(controller.canRequest(Permissions.USER_UPDATE), patchHandlerUsers);
-
-export default router.handler({
-  onNoMatch,
-  onError,
-});
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .get(controller.canRequest(Permissions.USER_READ), getHandlerUsers)
+  .patch(controller.canRequest(Permissions.USER_UPDATE), patchHandlerUsers)
+  .handler({ onNoMatch, onError });
 
 async function getHandlerUsers(request, response) {
   const username = request.query?.username;

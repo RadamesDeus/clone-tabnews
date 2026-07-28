@@ -41,6 +41,7 @@ export function onError(err, req, res) {
 export function setSessionCookie(response, sessionToken) {
   const setCookes = cookie.serialize("session_id", sessionToken, {
     httpOnly: true,
+    SameSite: "Lax",
     path: "/",
     maxAge: session.EXPIRESATINDAYS_IN_MILLSECOND / 1000,
     secure: process.env.NODE_ENV === "production",
@@ -52,6 +53,7 @@ export function setSessionCookie(response, sessionToken) {
 export function cleanSessionCookie(response) {
   const setCookes = cookie.serialize("session_id", "invalid", {
     httpOnly: true,
+    SameSite: "Lax",
     path: "/",
     maxAge: -1,
     secure: process.env.NODE_ENV === "production",

@@ -15,7 +15,7 @@ describe("USE case:  Registration Flow.test (all successful)", () => {
   let activationTokenMatch;
 
   test("Create user account", async () => {
-    const response = await fetch("http://localhost:3000/api/v1/users", {
+    const response = await fetch(`${webserver.getOrigin()}/api/v1/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -61,7 +61,7 @@ describe("USE case:  Registration Flow.test (all successful)", () => {
 
   test("Activate account was created", async () => {
     const response = await fetch(
-      `http://localhost:3000/api/v1/activations/${activationTokenMatch.id}`,
+      `${webserver.getOrigin()}/api/v1/activations/${activationTokenMatch.id}`,
       {
         method: "PATCH",
       },
@@ -78,7 +78,7 @@ describe("USE case:  Registration Flow.test (all successful)", () => {
     expect(userActive.features).toContain(Permissions.SESSION_READ);
 
     const response2 = await fetch(
-      `http://localhost:3000/api/v1/activations/${activationTokenMatch.id}`,
+      `${webserver.getOrigin()}/api/v1/activations/${activationTokenMatch.id}`,
       {
         method: "PATCH",
       },
@@ -95,7 +95,7 @@ describe("USE case:  Registration Flow.test (all successful)", () => {
   });
 
   test("Login account was created", async () => {
-    const response = await fetch("http://localhost:3000/api/v1/sessions", {
+    const response = await fetch(`${webserver.getOrigin()}/api/v1/sessions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

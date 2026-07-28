@@ -77,8 +77,8 @@ describe("models/authorization.js", () => {
         id: 1,
         username: "NomeQualquer",
         features: ["activation:token"],
-        created_at: "",
-        updated_at: "",
+        created_at: "2026-01-01T00:00:00.000Z",
+        updated_at: "2026-01-01T00:00:00.000Z",
         email: "NomeQualquer@teste.com",
         password: "123",
       };
@@ -89,8 +89,8 @@ describe("models/authorization.js", () => {
         id: 1,
         username: "NomeQualquer",
         features: ["activation:token"],
-        created_at: "",
-        updated_at: "",
+        created_at: "2026-01-01T00:00:00.000Z",
+        updated_at: "2026-01-01T00:00:00.000Z",
       });
     });
   });

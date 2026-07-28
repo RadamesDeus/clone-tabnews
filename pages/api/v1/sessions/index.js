@@ -7,24 +7,16 @@ import authorization from "models/authorization.js";
 import session from "models/session.js";
 import { ForbiddenError } from "infra/errors.js";
 
-const router = createRouter();
-
-router.use(controller.injectAnonymousOrUser);
-router.post(
-  controller.canRequest(Permissions.SESSION_CREATE),
-  postHandlerSessions,
-);
-router.delete(deleteHandlerSessions);
-
-export default router.handler({
-  onNoMatch,
-  onError,
-});
+export default createRouter()
+  .use(controller.injectAnonymousOrUser)
+  .post(controller.canRequest(Permissions.SESSION_CREATE), postHandlerSessions)
+  .delete(deleteHandlerSessions)
+  .handler({ onNoMatch, onError });
 
 async function postHandlerSessions(request, response) {
   const userData = request.body; //JSON.parse(request.body);
 
-  const userAuthenticated = await authentication.getAuthenticationUser(
+  const userAuthenticated = await authentication.getUser(
     userData.email,
     userData.password,
   );

@@ -1,5 +1,6 @@
 import orchestrator from "tests/orchestrator.js";
 import { Permissions } from "infra/rule.js";
+import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.cleanDatabase();
@@ -19,7 +20,7 @@ describe("GET  /api/v1/users/[username]", () => {
       const sessionObj = await orchestrator.createSession(createdUser.id);
 
       const response1 = await fetch(
-        "http://localhost:3000/api/v1/users/MesmoCase",
+        `${webserver.getOrigin()}/api/v1/users/MesmoCase`,
         {
           method: "GET",
           headers: {
@@ -58,7 +59,7 @@ describe("GET  /api/v1/users/[username]", () => {
       const sessionObj = await orchestrator.createSession(createdUser.id);
 
       const response1 = await fetch(
-        "http://localhost:3000/api/v1/users/casemismatch",
+        `${webserver.getOrigin()}/api/v1/users/casemismatch`,
         {
           method: "GET",
           headers: {
@@ -86,7 +87,7 @@ describe("GET  /api/v1/users/[username]", () => {
 
     test("With user not existing `username`", async () => {
       const response = await fetch(
-        "http://localhost:3000/api/v1/users/noUserNameExist",
+        `${webserver.getOrigin()}/api/v1/users/noUserNameExist`,
         {
           method: "GET",
           headers: {
